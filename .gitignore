@@ -8,4 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+
+.env
+
+# Database
 dev-tools/pgdata

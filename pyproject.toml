@@ -5,10 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.16.1",
     "fastapi[standard]>=0.115.12",
     "icecream>=2.1.4",
     "loguru>=0.7.3",
     "pgvector>=0.4.1",
+    "psycopg>=3.2.9",
     "pydantic-settings>=2.9.1",
     "sqlalchemy>=2.0.41",
     "structlog>=25.3.0",
