@@ -12,6 +12,9 @@ from alembic import context
 
 from app.config.settings import settings as s
 from app.core.database.db import Base
+from app.models import OpenAIEmbedding, User, MemoryChunk, EmbeddingType
+
+target_metadata = [Base.metadata]
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -31,7 +34,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+# target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
