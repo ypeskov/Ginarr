@@ -7,6 +7,7 @@ from app.core.database.db import get_db
 from app.services.auth.errors import UserAlreadyExists, InvalidPassword
 from app.models.User import User
 from app.dependencies.auth import get_current_user
+from app.core.logger.app_logger import log
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -51,4 +52,6 @@ async def get_me(current_user: User = Depends(get_current_user)):
         "first_name": current_user.first_name,
         "last_name": current_user.last_name,
         "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+        "updated_at": current_user.updated_at,
     }
