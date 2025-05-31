@@ -7,6 +7,7 @@ from app.core.database.db import get_db
 from app.services.auth.errors import UserAlreadyExists, InvalidPassword
 from app.models.User import User
 from app.dependencies.auth import get_current_user
+from app.core.logger.app_logger import log
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -16,6 +17,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     try:
         user = await auth_service.register_user(data, db)
     except UserAlreadyExists:
+        log.info(f"User already exists: {data.email}")
         raise HTTPException(status_code=409, detail="User already exists")
     return {"email": user.email, "message": "User registered"}
 
@@ -24,6 +26,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
     user = await auth_service.authenticate_user(data, db)
     if not user:
+        log.warning(f"Invalid credentials: {data.email}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     access_token = auth_service.create_access_token({"sub": user.email})
@@ -39,16 +42,20 @@ async def change_password(
     try:
         await auth_service.change_password(current_user, data, db)
     except InvalidPassword:
+        log.warning(f"Invalid password: {current_user.email}")
         raise HTTPException(status_code=400, detail="Incorrect password")
     return {"message": "Password changed successfully"}
 
 
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
+    log.info(f"Getting current user: {current_user}")
     return {
         "id": current_user.id,
         "email": current_user.email,
         "first_name": current_user.first_name,
         "last_name": current_user.last_name,
         "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+        "updated_at": current_user.updated_at,
     }
