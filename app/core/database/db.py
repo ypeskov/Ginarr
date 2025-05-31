@@ -1,21 +1,16 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import declarative_base
 from app.config.settings import settings as s
 
+SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{s.DB_USER}:{s.DB_PASSWORD}@{s.DB_HOST}:{s.DB_PORT}/{s.DB_NAME}"
 
-SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg://{s.DB_USER}:{s.DB_PASSWORD}@{s.DB_HOST}:{s.DB_PORT}/{s.DB_NAME}"
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=False)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 Base = declarative_base()
 
 
-def get_db():  # pragma: no cover
-    db = SessionLocal()
-    try:
+async def get_db():  # pragma: no cover
+    async with SessionLocal() as db:
         yield db
-    finally:
-        db.close()
