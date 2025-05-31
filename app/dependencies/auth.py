@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.config.settings import settings
+from app.core.logger.app_logger import log
 from app.core.database.db import get_db
 from app.models.User import User
 
@@ -21,16 +22,13 @@ async def get_current_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
     )
-
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        user_data = payload.get("sub")
-        if not user_data or not isinstance(user_data, dict):
-            raise credentials_exception
-        email = user_data.get("email")
+        email = payload.get("sub")
         if not email:
             raise credentials_exception
-    except JWTError:
+    except JWTError as e:
+        log.error(f"JWTError: {e}")
         raise credentials_exception
 
     result = await db.execute(select(User).where(User.email == email))

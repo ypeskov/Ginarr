@@ -3,13 +3,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from icecream import ic
 
-from app.core.logger.app_logger import get_app_logger
+from app.core.logger.app_logger import log
 from app.api.v1.routers.auth_router import router as auth_router
 
 ic.configureOutput(includeContext=True)
 
-logger = get_app_logger()
-logger.info("Starting the application")
+log.info("Starting the application")
 
 is_prod = False
 
