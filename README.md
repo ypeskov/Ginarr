@@ -1,22 +1,39 @@
-# AI Assistant for personal usage
+# AI Assistant for Personal Usage
 
 ## Project Overview
 
-This project is your personal AI assistant, designed for the **long-term accumulation and efficient utilization of personal knowledge**. Its core purpose is to act as your "second brain," helping you organize thoughts, notes, messages, and events, and extract valuable context for deeper analysis. The assistant is engineered with a strong focus on **data privacy** and **architectural flexibility**, ensuring you maintain full control over your information and can adapt the system to future technological advancements. Ultimately, it aims to evolve into a comprehensive helper capable of interacting with various services and executing a wide range of tasks, leveraging both local AI models and powerful external LLMs for the most complex queries.
+This project is your personal AI assistant, designed for the **long-term accumulation and efficient utilization of personal knowledge**.
+
+Its core purpose is to act as your "second brain" — helping you organize thoughts, notes, messages, and events, and extract valuable context for deeper analysis.
+
+The assistant is engineered with a strong focus on:
+- **Data privacy** — you stay in control of your own data.
+- **Architectural flexibility** — easy to adapt as tech evolves.
+
+Eventually, it should evolve into a comprehensive helper capable of:
+- Interacting with external services and APIs.
+- Executing a wide range of tasks.
+- Leveraging both **local AI models** and powerful **external LLMs** for complex queries.
+
+> ⚠️ This is an early-stage project. The API and structure may change.
 
 ---
 
 # Development Setup
 
 ## Requirements
-- Postgres 17 (maybe 16 will work also)
-- python 3.13
+
+- Python 3.13
+- Postgres 17 (Postgres 16 may work, but not officially tested)
 - Git
-- uv package manager
-- Docker or any other compatible engine
+- [`uv`](https://github.com/astral-sh/uv) package manager
+- Docker (or any other compatible container engine)
+
+---
 
 ## Installation
-Before you begin, please ensure you have all the **Requirements** installed.
+
+Before you begin, make sure all **Requirements** are installed.
 
 ```bash
 # Clone the repository
@@ -24,17 +41,30 @@ git clone [YOUR_REPO_URL]
 cd [YOUR_PROJECT_FOLDER_NAME]
 ```
 
-### Setting up DB with vector support
+---
+
+### Setting up Postgres with pgvector
+
 ```bash
 cd dev-tools
-docker-compose up
+docker-compose up -d
+```
 
-# Add pgvector extension: 
+Once the container is running, enable the `pgvector` extension:
+
+```bash
 docker exec -it pgvector-db psql -U oktal -d oktaldb -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
 
-# Check extension:
+Verify that the extension is installed:
+
+```bash
 docker exec -it pgvector-db psql -U oktal -d oktaldb -c "\dx"
-# Output should be something like:
+```
+
+Expected output:
+
+```
                              List of installed extensions
   Name   | Version |   Schema   |                     Description
 ---------+---------+------------+------------------------------------------------------
@@ -43,15 +73,27 @@ docker exec -it pgvector-db psql -U oktal -d oktaldb -c "\dx"
 (2 rows)
 ```
 
-## Set up Python Virtual env
-Create a virtual environment:
+---
+
+### Set up Python virtual environment
+
 ```bash
-cd "your project dir"
+cd [YOUR_PROJECT_FOLDER_NAME]
 uv venv
 
-# Activate the virtual environment
+# Activate virtual environment
 source .venv/bin/activate
 
 # Install dependencies from pyproject.toml
 uv sync
 ```
+
+---
+
+## Next Steps
+
+- [ ] Set environment variables (if needed)
+- [ ] Run first test command
+- [ ] Add first note or memory
+- [ ] Connect a frontend or CLI interface (optional)
+

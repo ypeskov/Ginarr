@@ -1,0 +1,69 @@
+flowchart TD
+    subgraph Client
+        Browser["Браузер (React/Vue)"]
+    end
+
+    subgraph API
+        FastAPI["FastAPI роуты"]
+    end
+
+    subgraph AppCore
+        AssistantService["AssistantService (сервисный слой)"]
+        LangChain["LangChain / LangGraph"]
+        LlamaIndex["LlamaIndex"]
+    end
+
+    subgraph Worker["Фоновые задачи (Celery)"]
+        ReEmbed["Переэмбеддинг / Переиндексация"]
+        Importer["Импорт (файлы, письма, события)"]
+        Analyzer["Фоновый анализ / summary / паттерны"]
+    end
+
+    subgraph Embedding
+        Embedder["bge-m3 (sentence-transformers)"]
+    end
+
+    subgraph Storage
+        PGDocs["PostgreSQL: documents + metadata"]
+        PGVec["PostgreSQL: embeddings (pgvector)"]
+        VectorStore["VectorStore (абстракция над embedding-хранилищем)"]
+    end
+
+    subgraph LLM
+        GPT["LLM API (GPT-4 / Gemini)"]
+    end
+
+    subgraph External["Внешние сервисы (интеграции)"]
+        Email["Почта (IMAP, Gmail API)"]
+        Calendar["Календарь (Google, Outlook)"]
+        MCPTools["MCP / плагины / внешние источники"]
+    end
+
+    Browser -->|HTTP| FastAPI
+    FastAPI --> AssistantService
+
+    AssistantService --> LangChain
+    AssistantService --> LlamaIndex
+    AssistantService --> Embedder
+    AssistantService --> VectorStore
+    AssistantService --> GPT
+    AssistantService --> PGDocs
+    AssistantService --> Email
+    AssistantService --> Calendar
+    AssistantService --> MCPTools
+
+    LangChain --> GPT
+    LangChain --> VectorStore
+    LangChain --> MCPTools
+    LlamaIndex --> VectorStore
+
+    Embedder --> PGVec
+    VectorStore --> PGVec
+
+    FastAPI -->|отправка задач| Worker
+    Worker --> Embedder
+    Worker --> PGDocs
+    Worker --> PGVec
+    Worker --> GPT
+    Worker --> Email
+    Worker --> Calendar
