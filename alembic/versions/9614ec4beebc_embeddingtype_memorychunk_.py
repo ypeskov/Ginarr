@@ -1,8 +1,8 @@
 """EmbeddingType, MemoryChunk, OpenAIEmbedding
 
-Revision ID: cf453c3d4c3a
+Revision ID: 9614ec4beebc
 Revises: 5bf5c9f1e2f3
-Create Date: 2025-05-31 22:30:13.495917
+Create Date: 2025-05-31 22:46:43.132156
 
 """
 
@@ -14,7 +14,7 @@ import pgvector
 
 
 # revision identifiers, used by Alembic.
-revision: str = "cf453c3d4c3a"
+revision: str = "9614ec4beebc"
 down_revision: Union[str, None] = "5bf5c9f1e2f3"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

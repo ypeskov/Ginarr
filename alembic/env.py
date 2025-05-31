@@ -12,7 +12,7 @@ from alembic import context
 
 from app.config.settings import settings as s
 from app.core.database.db import Base
-from app.models import OpenAIEmbedding, User, MemoryChunk, EmbeddingType
+from app.models import OpenAIEmbedding, User, MemoryChunk, EmbeddingType  # noqa: F401
 
 target_metadata = [Base.metadata]
 

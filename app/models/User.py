@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database.db import Base
+
+if TYPE_CHECKING:
+    from app.models.MemoryChunk import MemoryChunk
 
 
 class User(Base):
@@ -12,7 +16,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    memory_chunks: Mapped[list["MemoryChunk"]] = relationship("MemoryChunk", back_populates="user")
+    memory_chunks: Mapped[list["MemoryChunk"]] = relationship("MemoryChunk", back_populates="user")  # noqa: F821
 
     def __repr__(self):
         return (
