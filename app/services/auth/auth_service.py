@@ -10,6 +10,7 @@ from app.models.User import User
 from app.api.v1.schemas.auth_schema import UserRegister, UserLogin, ChangePassword
 from app.config.settings import settings
 from app.services.auth.errors import UserAlreadyExists, InvalidPassword
+from app.core.logger.app_logger import log
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -47,9 +48,13 @@ async def register_user(data: UserRegister, db: AsyncSession) -> User:
 
 
 async def authenticate_user(data: UserLogin, db: AsyncSession) -> Optional[User]:
-    result = await db.execute(select(User).where(User.email == data.email))
-    user = result.scalar_one_or_none()
-    if not user or not verify_password(data.password, user.hashed_password):
+    try:
+        result = await db.execute(select(User).where(User.email == data.email))
+        user = result.scalar_one_or_none()
+        if not user or not verify_password(data.password, user.hashed_password):
+            return None
+    except Exception as e:
+        log.error(f"Error authenticating user: {e}")
         return None
     return user
 
