@@ -5,6 +5,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.api.v1.routers.auth_router import router as auth_router
+from app.api.v1.routers.memory_router import router as memory_router
 
 ic.configureOutput(includeContext=True)
 
@@ -28,6 +29,8 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(memory_router)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

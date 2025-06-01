@@ -24,13 +24,17 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login")
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    user = await auth_service.authenticate_user(data, db)
-    if not user:
-        log.warning(f"Invalid credentials: {data.email}")
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    try:
+        user = await auth_service.authenticate_user(data, db)
+        if not user:
+            log.warning(f"Invalid credentials: {data.email}")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    access_token = auth_service.create_access_token({"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+        access_token = auth_service.create_access_token({"sub": user.email})
+        return {"access_token": access_token, "token_type": "bearer"}
+    except Exception as e:
+        log.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error during login")
 
 
 @router.post("/change-password")
@@ -44,6 +48,9 @@ async def change_password(
     except InvalidPassword:
         log.warning(f"Invalid password: {current_user.email}")
         raise HTTPException(status_code=400, detail="Incorrect password")
+    except Exception as e:
+        log.error(f"Password change error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error during password change")
     return {"message": "Password changed successfully"}
 
 
