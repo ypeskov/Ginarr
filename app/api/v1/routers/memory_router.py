@@ -26,7 +26,7 @@ async def store_memory_endpoint(
         return await store_memory(db, user_id=user.id, content=memory_in.content)
     except MemoryAddError as e:
         log.error(f"Error storing memory for user [{user.id}]: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
     except Exception as e:
         log.error(f"Error storing memory for user [{user.id}]: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")

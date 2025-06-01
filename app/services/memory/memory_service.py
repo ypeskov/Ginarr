@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger.app_logger import log
 from app.models.MemoryChunk import MemoryChunk
 from app.services.memory.memory_errors import MemoryAddError
+from app.services.embedding.embedding_service import generate_embeddings_from_memory_chunk
+from app.services.embedding.embedding_errors import EmbeddingSaveError
 
 
 async def store_memory(db: AsyncSession, user_id: int, content: str) -> MemoryChunk:
@@ -22,6 +24,12 @@ async def store_memory(db: AsyncSession, user_id: int, content: str) -> MemoryCh
         await db.commit()
         await db.refresh(memory)
         log.info(f"Memory chunk stored for user [{user_id}] with ID [{memory.id}]")
+        try:
+            # TODO: queue embedding job for async retry
+            await generate_embeddings_from_memory_chunk(db, memory.id, content)
+        except EmbeddingSaveError as e:
+            log.error(f"Error generating embeddings for memory chunk [{memory.id}]: {str(e)}")
+            raise MemoryAddError(f"Error generating embeddings for memory chunk [{memory.id}]: {str(e)}")
     except Exception as e:
         log.error(f"Error storing memory for user [{user_id}]: {str(e)}")
         raise MemoryAddError(f"Error storing memory for user [{user_id}]: {str(e)}")

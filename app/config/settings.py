@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = "123"
     SECRET_KEY: str = "111111111"
 
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-large"
+    OPENAI_EMBEDDING_MAX_CHUNK_SIZE: int = 8191
+    OPENAI_API_KEY: str = "sk-proj-123"
+
     model_config = SettingsConfigDict(env_file=(".env", ".env.local", ".env.prod"))
 
 
