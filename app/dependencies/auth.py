@@ -18,6 +18,18 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> User:
+    """
+    Get the current user from the database.
+    Args:
+        token: Annotated[str, Depends(oauth2_scheme)] - The JWT token.
+        db: Annotated[AsyncSession, Depends(get_db)] - The database session.
+    Returns:
+        User: The current user.
+    Raises:
+        HTTPException: 401 - Unauthorized.
+        JWTError: If the JWT token is invalid.
+        SQLAlchemyError: If the user is not found.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Unauthorized",

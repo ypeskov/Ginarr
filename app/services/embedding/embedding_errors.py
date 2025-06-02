@@ -8,3 +8,7 @@ class EmbeddingSplitError(Exception):
 
 class EmbeddingSaveError(Exception):
     pass
+
+
+class EmbeddingModelNotFoundError(Exception):
+    pass

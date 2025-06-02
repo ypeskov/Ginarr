@@ -6,6 +6,7 @@ from pgvector.sqlalchemy import Vector
 
 from app.core.database.db import Base
 from app.models.EmbeddingType import EmbeddingType
+from app.models.BaseEmbeddingModel import BaseEmbeddingModel
 
 
 # --- CONSTANTS FOR CLARITY ---
@@ -14,7 +15,7 @@ OPENAI_EMBEDDING_DIMENSION = 3072
 # -----------------------------
 
 
-class OpenAIEmbedding(Base):
+class OpenAIEmbedding(Base, BaseEmbeddingModel):
     __tablename__ = "openai_embeddings"
 
     id: Mapped[int] = mapped_column(primary_key=True)
