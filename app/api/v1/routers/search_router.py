@@ -26,6 +26,6 @@ async def search_chunks(
         )
     except Exception as e:
         log.error(f"Error searching embeddings: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
 
     return search_results

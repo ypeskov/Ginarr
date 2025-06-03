@@ -9,7 +9,7 @@ from app.services.embedding.backends.base import EmbeddingBackend
 
 class OpenAIEmbeddingBackend(EmbeddingBackend):
     def __init__(self) -> None:
-        self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
     async def get_embeddings(self, texts: list[str], model: str = settings.OPENAI_EMBEDDING_MODEL) -> list[list[float]]:
         """

@@ -8,6 +8,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.models.MemoryChunk import MemoryChunk
+from app.models.OpenAIEmbedding import OpenAIEmbedding
 from app.models.BaseEmbeddingModel import BaseEmbeddingModel
 from app.models.EmbeddingType import EmbeddingType, EmbeddingTypeName
 from app.services.embedding.embedding_service import get_embedding_provider
@@ -21,8 +22,8 @@ ic.configureOutput(includeContext=True)
 
 # supported embedding models
 embedding_model_registry = {
-    AvailableEmbeddingModels.TEXT_EMBEDDING_3_LARGE: BaseEmbeddingModel,
-    AvailableEmbeddingModels.TEXT_EMBEDDING_3_SMALL: BaseEmbeddingModel,
+    AvailableEmbeddingModels.TEXT_EMBEDDING_3_LARGE: OpenAIEmbedding,
+    AvailableEmbeddingModels.TEXT_EMBEDDING_3_SMALL: OpenAIEmbedding,
     # "mistral": MistralEmbedding,
     # "gemini": GeminiEmbedding,
 }

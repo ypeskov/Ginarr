@@ -1,3 +1,4 @@
+from pydantic import SecretStr
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
     EMBEDDING_PROVIDER: str = "openai"
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-large"
     OPENAI_EMBEDDING_MAX_CHUNK_SIZE: int = 8191
-    OPENAI_API_KEY: str = "sk-proj-123"
+    OPENAI_API_KEY: SecretStr = SecretStr("sk-proj-123")
 
     model_config = SettingsConfigDict(env_file=(".env", ".env.local", ".env.prod"))
 
