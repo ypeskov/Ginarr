@@ -11,12 +11,38 @@ from app.models.MemoryChunk import MemoryChunk
 from app.models.BaseEmbeddingModel import BaseEmbeddingModel
 from app.models.EmbeddingType import EmbeddingType, EmbeddingTypeName
 from app.services.embedding.embedding_service import get_embedding_provider
-from app.services.embedding.embedding_errors import EmbeddingGetError
-from app.services.embedding.registry.models import get_embedding_model, AvailableEmbeddingModels
+from app.services.embedding.embedding_errors import EmbeddingGetError, EmbeddingModelNotFoundError
+from app.services.embedding.registry.models import AvailableEmbeddingModels
 from app.config.settings import settings
 from app.services.embedding.backends.base import EmbeddingBackend
 
 ic.configureOutput(includeContext=True)
+
+
+# supported embedding models
+embedding_model_registry = {
+    AvailableEmbeddingModels.TEXT_EMBEDDING_3_LARGE: BaseEmbeddingModel,
+    AvailableEmbeddingModels.TEXT_EMBEDDING_3_SMALL: BaseEmbeddingModel,
+    # "mistral": MistralEmbedding,
+    # "gemini": GeminiEmbedding,
+}
+
+
+def get_embedding_model(embedding_model_name: AvailableEmbeddingModels) -> type[BaseEmbeddingModel]:
+    """
+    Get the embedding model class by name.
+    Args:
+        embedding_model_name: (str) name of the embedding model
+    Returns:
+        (type[BaseEmbeddingModel]) embedding model class
+    Raises:
+        (EmbeddingModelNotFoundError) if the embedding model is not found
+    """
+    embedding_model = embedding_model_registry.get(embedding_model_name)
+    if not embedding_model:
+        raise EmbeddingModelNotFoundError(f"Unknown embedding model: {embedding_model_name}")
+
+    return embedding_model
 
 
 async def search_embeddings(
