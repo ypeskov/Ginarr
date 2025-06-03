@@ -10,19 +10,13 @@ from app.core.logger.app_logger import log
 from app.models.MemoryChunk import MemoryChunk
 from app.models.BaseEmbeddingModel import BaseEmbeddingModel
 from app.models.EmbeddingType import EmbeddingType, EmbeddingTypeName
-from app.services.embedding.embedding_service import get_embeddings
-from app.services.embedding.embedding_errors import EmbeddingGetError, EmbeddingModelNotFoundError
-from app.services.embedding.embedding_registry import embedding_model_registry
+from app.services.embedding.embedding_service import get_embedding_provider
+from app.services.embedding.embedding_errors import EmbeddingGetError
+from app.services.embedding.registry.models import get_embedding_model, AvailableEmbeddingModels
+from app.config.settings import settings
+from app.services.embedding.backends.base import EmbeddingBackend
 
 ic.configureOutput(includeContext=True)
-
-
-def get_embedding_model(embedding_model_name: str) -> type[BaseEmbeddingModel]:
-    embedding_model = embedding_model_registry.get(embedding_model_name)
-    if not embedding_model:
-        raise EmbeddingModelNotFoundError(f"Unknown embedding model: {embedding_model_name}")
-
-    return embedding_model
 
 
 async def search_embeddings(
@@ -30,20 +24,22 @@ async def search_embeddings(
     user_id: int,
     query: str,
     embedding_types: list[str],
-    embedding_model_name: str = "text-embedding-3-large",
+    embedding_model_name: AvailableEmbeddingModels = AvailableEmbeddingModels.TEXT_EMBEDDING_3_LARGE,
+    embedding_provider_name: str = settings.EMBEDDING_PROVIDER,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
 ):
     embedding_model: type[BaseEmbeddingModel] = get_embedding_model(embedding_model_name)
     # Get query embedding
+    provider: EmbeddingBackend = get_embedding_provider(provider=embedding_provider_name)
     try:
-        query_vector = (await get_embeddings([query]))[0]
+        query_vector = (await provider.get_embeddings([query], model=embedding_model_name.value))[0]
     except EmbeddingGetError as e:
         log.error(f"Failed to get embeddings: {str(e)}")
         raise EmbeddingGetError(f"Failed to get embeddings: {str(e)}")
 
     # Resolve embedding_type_id for requested names
-    result = await get_embedding_types_by_id(db_session, embedding_types)
+    result = await get_embedding_types_by_name(db_session, embedding_types)
     type_map = {name: id_ for id_, name in result.all()}
     if not type_map:
         return []
@@ -74,14 +70,23 @@ async def search_embeddings(
     return [chunk for chunk, _ in rows]
 
 
-async def get_embedding_types_by_id(
+async def get_embedding_types_by_name(
     db_session: AsyncSession, embedding_types: list[str]
 ) -> Result[tuple[int, EmbeddingTypeName]]:
+    """
+    Get embedding types by name.
+    Args:
+        db_session: (AsyncSession) database session
+        embedding_types: (list[str]) list of embedding type names
+    Returns:
+        (Result[tuple[int, EmbeddingTypeName]]) result of the query
+    Raises:
+        (EmbeddingGetError) if the query fails
+    """
     try:
         result = await db_session.execute(
             select(EmbeddingType.id, EmbeddingType.name).where(EmbeddingType.name.in_(embedding_types))
         )
-        ic(result)
     except EmbeddingGetError as e:
         log.error(f"Failed to get embedding types: {e}")
         raise EmbeddingGetError(f"Failed to get embedding types: {e}")

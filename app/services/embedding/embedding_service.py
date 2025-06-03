@@ -1,22 +1,27 @@
-import tiktoken
 from sqlalchemy.ext.asyncio import AsyncSession
-from openai import AsyncOpenAI
 
 from app.config.settings import settings
-from app.models.OpenAIEmbedding import OpenAIEmbedding
-from app.models.EmbeddingType import EmbeddingTypeName
 from app.core.logger.app_logger import log
-from app.services.embedding.embedding_errors import EmbeddingGetError, EmbeddingSaveError
-from app.services.embedding.embedding_helpers import get_embedding_type_id_by_name
+from app.services.embedding.embedding_errors import EmbeddingSaveError, EmbeddingGetError
+from app.services.embedding.stores.embedding_postgres_store import EmbeddingPostgresStore
+from app.services.embedding.backends.base import EmbeddingBackend
+from app.services.embedding.backends.provider import provide_embedding_backend
+from app.services.embedding.stores.embedding_base_store import EmbeddingBaseStore
+
+
+def get_embedding_provider(provider: str = settings.EMBEDDING_PROVIDER) -> EmbeddingBackend:
+    return provide_embedding_backend(provider)
 
 
 async def generate_embeddings_from_memory_chunk(
     db: AsyncSession,
     memory_chunk_id: int,
     text: str,
+    embedding_store: EmbeddingBaseStore | None = None,
     model: str = settings.OPENAI_EMBEDDING_MODEL,
+    embedding_provider_name: str = settings.EMBEDDING_PROVIDER,
     max_tokens_per_chunk: int = settings.OPENAI_EMBEDDING_MAX_CHUNK_SIZE,
-) -> list[OpenAIEmbedding]:
+) -> bool:
     """
     Generate and save OpenAI embeddings for a given memory chunk
     Args:
@@ -28,78 +33,27 @@ async def generate_embeddings_from_memory_chunk(
     Returns:
         (list[OpenAIEmbedding]) The list of generated embeddings
     """
-    chunks = split_text_into_chunks(text, max_tokens_per_chunk=max_tokens_per_chunk)
-    embeddings = await get_embeddings(chunks, model=model)
+    if embedding_store is None:
+        embedding_store = EmbeddingPostgresStore(db)
 
-    results = []
-    # we use only TEXT embedding type for now
-    # TODO: add support for other embedding types
-    embedding_type_id = await get_embedding_type_id_by_name(db, EmbeddingTypeName.TEXT)
-    for chunk_text, vector in zip(chunks, embeddings):
-        obj: OpenAIEmbedding = OpenAIEmbedding(
-            chunk_id=memory_chunk_id,
-            embedding=vector,
-            embedding_model_name=model,
-            embedding_type_id=embedding_type_id,
-        )
-        db.add(obj)
-        results.append(obj)
+    embedding_provider: EmbeddingBackend = get_embedding_provider(provider=embedding_provider_name)
+
+    chunks = embedding_provider.split_text_into_chunks(text, max_tokens_per_chunk=max_tokens_per_chunk)
+    try:
+        embeddings = await embedding_provider.get_embeddings(chunks, model=model)
+    except EmbeddingGetError as e:
+        log.error(f"Error getting embeddings for memory chunk [{memory_chunk_id}]: {str(e)}")
+        raise EmbeddingGetError(f"Error getting embeddings for memory chunk [{memory_chunk_id}]: {str(e)}")
 
     try:
-        await db.commit()
-        log.info(f"Embeddings generated and saved for memory chunk [{memory_chunk_id}]")
+        saved: bool = await embedding_store.save_embeddings(
+            chunks=chunks,
+            embeddings=embeddings,
+            embedding_model_name=model,
+            memory_chunk_id=memory_chunk_id,
+        )
     except EmbeddingSaveError as e:
         log.error(f"Error saving embeddings for memory chunk [{memory_chunk_id}]: {str(e)}")
         raise EmbeddingSaveError(f"Error saving embeddings for memory chunk [{memory_chunk_id}]: {str(e)}")
 
-    return results
-
-
-def split_text_into_chunks(
-    text: str,
-    max_tokens_per_chunk: int = settings.OPENAI_EMBEDDING_MAX_CHUNK_SIZE,
-    model: str = settings.OPENAI_EMBEDDING_MODEL,
-) -> list[str]:
-    """
-    Split text into chunks based on token count, respecting max_tokens_per_chunk
-    Args:
-        text: (str) The text to split into chunks
-        max_tokens_per_chunk: (int) The maximum number of tokens per chunk
-        model: (str) The model to use for tokenization
-    Returns:
-        (list[str]) The list of chunks
-    """
-    enc = tiktoken.encoding_for_model(model)
-    tokens = enc.encode(text)
-
-    chunks = []
-    for i in range(0, len(tokens), max_tokens_per_chunk):
-        chunk_tokens = tokens[i : i + max_tokens_per_chunk]
-        chunk_text = enc.decode(chunk_tokens)
-        chunks.append(chunk_text)
-
-    return chunks
-
-
-async def get_embeddings(texts: list[str], model: str = settings.OPENAI_EMBEDDING_MODEL) -> list[list[float]]:
-    """
-    Call OpenAI API to get embeddings for a list of texts
-    Args:
-        texts: (list[str]) The list of texts to get embeddings for
-        model: (str) The model to use for generating embeddings
-    Returns:
-        (list[list[float]]) The list of embeddings
-    """
-    log.info(f"Getting embeddings for {len(texts)} texts")
-    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-
-    try:
-        response = await client.embeddings.create(
-            input=texts,
-            model=model,
-        )
-        log.info(f"Embeddings generated for {len(texts)} texts")
-        return [e.embedding for e in response.data]
-    except EmbeddingGetError as e:
-        log.error(f"Failed to get embeddings: {str(e)}")
-        raise EmbeddingGetError(f"Failed to get embeddings: {str(e)}")
+    return saved
