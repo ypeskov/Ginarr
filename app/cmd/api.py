@@ -7,8 +7,7 @@ from app.core.logger.app_logger import log
 from app.api.v1.routers.auth_router import router as auth_router
 from app.api.v1.routers.memory_router import router as memory_router
 from app.api.v1.routers.search_router import router as search_router
-from app.api.v1.routers.oktal_router import router as oktal_router
-from app.oktal.graph import build_oktal_graph
+from app.api.v1.routers.ginarr_router import router as ginarr_router
 
 ic.configureOutput(includeContext=True)
 
@@ -35,7 +34,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(memory_router)
 app.include_router(search_router)
-app.include_router(oktal_router)
+app.include_router(ginarr_router)
 
 
 if __name__ == "__main__":

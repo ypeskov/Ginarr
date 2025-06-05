@@ -1,6 +1,6 @@
 from icecream import ic
 
-from app.oktal.llm.router_llm import router_llm
+from app.ginarr.llm.router_llm import router_llm
 
 ic.configureOutput(includeContext=True)
 

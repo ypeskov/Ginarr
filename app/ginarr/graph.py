@@ -1,32 +1,28 @@
-# app/oktal/graph.py
-
 from typing import TypedDict, Literal, Any
 import aiosqlite
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from langgraph.graph import StateGraph
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-from app.oktal.nodes.router import router_node
-from app.oktal.nodes.memory import memory_node
-from app.oktal.nodes.tool import tool_node
-from app.oktal.nodes.llm import llm_node
+from app.ginarr.nodes.router import router_node
+from app.ginarr.nodes.memory import memory_node
+from app.ginarr.nodes.tool import tool_node
+from app.ginarr.nodes.llm import llm_node
 
 
-class OktalState(TypedDict, total=False):
+class GinarrState(TypedDict, total=False):
     input: str
-    user_id: int
-    db_session: AsyncSession
+    user_id: int | None
     route: Literal["memory", "tool", "llm"]
     result: dict[str, Any]
 
 
-def end_node(state: OktalState) -> OktalState:
+def end_node(state: GinarrState) -> GinarrState:
     return state
 
 
-async def build_oktal_graph():
-    builder = StateGraph(state_schema=OktalState)
+async def build_ginarr_graph():
+    builder = StateGraph(state_schema=GinarrState)
 
     builder.add_node("router", router_node)
     builder.add_node("memory", memory_node)
@@ -44,7 +40,7 @@ async def build_oktal_graph():
     builder.add_edge("tool", "end")
     builder.add_edge("llm", "end")
 
-    conn = await aiosqlite.connect("./oktal_checkpoints.sqlite")
+    conn = await aiosqlite.connect("./ginarr_checkpoints.sqlite")
     checkpointer = AsyncSqliteSaver(conn=conn)
 
     return builder.compile(checkpointer=checkpointer)

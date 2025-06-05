@@ -4,7 +4,7 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "prod"
-    FRONTEND_URL: str = "https://oktal.ai"
+    FRONTEND_URL: str = "https://ginarr.ai"
 
     DB_USER: str = "username"
     DB_PASSWORD: str = "userpassword"
