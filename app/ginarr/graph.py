@@ -37,7 +37,13 @@ async def build_ginarr_graph():
     builder.set_entry_point("router")
 
     builder.add_conditional_edges(
-        "router", lambda state: state["route"], {"memory": "memory", "tool": "tool", "llm": "llm"}
+        "router",
+        lambda state: state["route"],
+        {
+            "memory": "memory",
+            "tool": "tool",
+            "llm": "llm",
+        },
     )
 
     builder.add_edge("memory", "end")
