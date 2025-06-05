@@ -12,6 +12,7 @@ wheels/
 .venv
 
 .env
+.env.ginarr
 
 # Database
 dev-tools/pgdata

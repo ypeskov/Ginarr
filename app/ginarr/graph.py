@@ -1,13 +1,17 @@
 from typing import TypedDict, Literal, Any
+from icecream import ic
 import aiosqlite
 
 from langgraph.graph import StateGraph
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
+from app.ginarr.settings import settings as ginarr_settings
 from app.ginarr.nodes.router import router_node
 from app.ginarr.nodes.memory import memory_node
 from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.llm import llm_node
+
+ic.configureOutput(includeContext=True)
 
 
 class GinarrState(TypedDict, total=False):
@@ -40,7 +44,7 @@ async def build_ginarr_graph():
     builder.add_edge("tool", "end")
     builder.add_edge("llm", "end")
 
-    conn = await aiosqlite.connect("./ginarr_checkpoints.sqlite")
+    conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)
     checkpointer = AsyncSqliteSaver(conn=conn)
 
     return builder.compile(checkpointer=checkpointer)
