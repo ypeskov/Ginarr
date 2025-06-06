@@ -1,8 +1,9 @@
 from langchain_core.runnables import RunnableConfig
 from langchain_core.runnables import Runnable
-from app.models.User import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from icecream import ic
+
+from app.models.User import User
 
 ic.configureOutput(includeContext=True)
 

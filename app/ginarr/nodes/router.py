@@ -10,4 +10,5 @@ async def router_node(state: dict) -> dict:
     result = await router_llm.ainvoke({"input": user_input})
     ic(result)
     state["route"] = result["route"]
+
     return state
