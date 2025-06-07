@@ -9,6 +9,12 @@ from app.api.v1.routers.memory_router import router as memory_router
 from app.api.v1.routers.search_router import router as search_router
 from app.api.v1.routers.ginarr_router import router as ginarr_router
 
+import debugpy
+
+debugpy.listen(("0.0.0.0", 5678))
+# debugpy.wait_for_client()
+print("Debugger is attached!")
+
 ic.configureOutput(includeContext=True)
 
 log.info("Starting the application")

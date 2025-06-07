@@ -42,7 +42,6 @@ def create_router_llm(prompt, llm) -> Runnable:
                 pass
         # Fallback: plain text from model
         text = getattr(msg, "content", "").strip().lower()
-        ic(text)
         return {"route": text if text in {"memory", "tool", "llm", "write"} else "llm"}
 
     # Try bind_tools, but fallback gracefully

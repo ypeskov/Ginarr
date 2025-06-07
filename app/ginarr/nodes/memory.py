@@ -1,13 +1,31 @@
 from icecream import ic
-from langchain_core.runnables import RunnableConfig
+from langchain_core.runnables import RunnableConfig, RunnableLambda
+from langchain_core.prompts import ChatPromptTemplate
 
+from app.ginarr.llm.llm_provider import chat_llm
 from app.services.search.embedding_search import search_embeddings
 
 ic.configureOutput(includeContext=True)
 
 
+relevance_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "Ты проверяешь, насколько найденный текст отвечает на запрос пользователя. Ответь 'yes' или 'no'."),
+        ("user", "Запрос: {query}\nНайденный текст: {found}"),
+    ]
+)
+
+relevance_checker = relevance_prompt | chat_llm | RunnableLambda(lambda msg: msg.content.strip().lower() == "yes")
+
+
 # The node that performs retrieval (RAG) using your embedding backend
 async def memory_node(state: dict, config: RunnableConfig) -> dict:
+    state["fallback_to_llm"] = False
+
+    debug_state = {k: v for k, v in state.items() if k != "result"}
+    ic(debug_state)
+    ic("************************************************")
+
     user_input = state.get("input", "")
     user_id = state.get("user_id", "")
 
@@ -25,10 +43,23 @@ async def memory_node(state: dict, config: RunnableConfig) -> dict:
         for chunk in results
     ]
 
-    state["result"] = {
-        "type": "memory",
-        "input": user_input,
-        "matches": matches,
-    }
+    ic()
+    if matches:
+        top_score = matches[0]["score"]
+        ic(top_score)
+        if top_score < 0.4:
+            is_relevant = await relevance_checker.ainvoke({"query": state["input"], "found": matches[0]["text"]})
+            ic(is_relevant)
+            if not is_relevant:
+                ic("Setting fallback_to_llm to True in memory_node")
+                state["fallback_to_llm"] = True
 
+        else:
+            state["result"] = {"type": "memory", "input": user_input, "output": matches}
+
+    else:
+        state["result"] = {"type": "memory", "input": user_input, "matches": matches}
+
+    ic({k: v for k, v in state.items() if k != "result"})
+    ic("--------------------------------")
     return state

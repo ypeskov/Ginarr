@@ -9,8 +9,16 @@ ic.configureOutput(includeContext=True)
 
 
 async def run_ginarr_agent(user_input: str, graph_instance: Runnable, user: User, db_session: AsyncSession) -> dict:
-    state = {"input": user_input, "user_id": user.id}
-    config: RunnableConfig = {"configurable": {"thread_id": user.id, "db_session": db_session}}
+    state = {
+        "input": user_input,
+        "user_id": user.id,
+    }
+    config: RunnableConfig = {
+        "configurable": {
+            "thread_id": user.id,
+            "db_session": db_session,
+        },
+    }
     result = await graph_instance.ainvoke(state, config=config)
     output = result.get("result", {})
 
