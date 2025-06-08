@@ -10,7 +10,7 @@ from app.core.logger.app_logger import log
 from app.ginarr.nodes.router import router_node
 from app.ginarr.nodes.memory import memory_node
 from app.ginarr.nodes.tool import tool_node
-from app.ginarr.nodes.llm import llm_node
+from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
 
 ic.configureOutput(includeContext=True)
 
@@ -41,19 +41,14 @@ def end_node(state: GinarrState) -> GinarrState:
     return state
 
 
-def check_fallback_node(state: GinarrState) -> GinarrState:
-    log.info("--- Entering check_fallback_node ---")
-    return state
-
-
-def should_fallback_to_llm(state: GinarrState) -> str:
-    log.info("--- Verifying fallback to LLM ---")
-    if state.get("fallback_to_llm") and not state.get("rerouted"):
-        log.info("Fallback to LLM is required")
-        state["rerouted"] = True
-        return "llm"
-    log.info("Fallback to LLM is not required")
-    return "end"
+# def should_fallback_to_llm(state: GinarrState) -> str:
+#     log.info("--- Verifying fallback to LLM ---")
+#     if state.get("fallback_to_llm") and not state.get("rerouted"):
+#         log.info("Fallback to LLM is required")
+#         state["rerouted"] = True
+#         return "llm"
+#     log.info("Fallback to LLM is not required")
+#     return "end"
 
 
 async def build_ginarr_graph():
@@ -64,7 +59,7 @@ async def build_ginarr_graph():
     builder.add_node("tool", tool_node)
     builder.add_node("llm", llm_node)
     builder.add_node("end", end_node)
-    builder.add_node("check_fallback", check_fallback_node)
+    builder.add_node("summarize_found_result", summarize_found_result_node)
 
     builder.set_entry_point("router")
 
@@ -78,20 +73,10 @@ async def build_ginarr_graph():
         },
     )
 
-    builder.add_edge("memory", "check_fallback")
-    builder.add_edge("tool", "check_fallback")
+    builder.add_edge("memory", "summarize_found_result")
+    builder.add_edge("tool", "summarize_found_result")
     builder.add_edge("llm", "end")
-
-    builder.add_edge("llm", "end")
-
-    builder.add_conditional_edges(
-        "check_fallback",
-        should_fallback_to_llm,
-        {
-            "llm": "llm",
-            "end": "end",
-        },
-    )
+    builder.add_edge("summarize_found_result", "end")
 
     conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)
     checkpointer = AsyncSqliteSaver(conn=conn)
