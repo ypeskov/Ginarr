@@ -2,6 +2,7 @@ from icecream import ic
 from langchain_core.runnables import RunnableConfig, RunnableLambda
 from langchain_core.prompts import ChatPromptTemplate
 
+from app.core.logger.app_logger import log
 from app.ginarr.llm.llm_provider import chat_llm
 from app.services.search.embedding_search import search_embeddings
 
@@ -22,10 +23,6 @@ relevance_checker = relevance_prompt | chat_llm | RunnableLambda(lambda msg: msg
 async def memory_node(state: dict, config: RunnableConfig) -> dict:
     state["fallback_to_llm"] = False
 
-    debug_state = {k: v for k, v in state.items() if k != "result"}
-    ic(debug_state)
-    ic("************************************************")
-
     user_input = state.get("input", "")
     user_id = state.get("user_id", "")
 
@@ -43,7 +40,6 @@ async def memory_node(state: dict, config: RunnableConfig) -> dict:
         for chunk in results
     ]
 
-    ic()
     if matches:
         top_score = matches[0]["score"]
         ic(top_score)
@@ -51,7 +47,7 @@ async def memory_node(state: dict, config: RunnableConfig) -> dict:
             is_relevant = await relevance_checker.ainvoke({"query": state["input"], "found": matches[0]["text"]})
             ic(is_relevant)
             if not is_relevant:
-                ic("Setting fallback_to_llm to True in memory_node")
+                log.info("Setting fallback_to_llm to True in memory_node")
                 state["fallback_to_llm"] = True
 
         else:
@@ -60,6 +56,4 @@ async def memory_node(state: dict, config: RunnableConfig) -> dict:
     else:
         state["result"] = {"type": "memory", "input": user_input, "matches": matches}
 
-    ic({k: v for k, v in state.items() if k != "result"})
-    ic("--------------------------------")
     return state
