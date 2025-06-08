@@ -55,7 +55,7 @@ async def search_embeddings(
     embedding_provider_name: str = settings.EMBEDDING_PROVIDER,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
-):
+) -> list[MemoryChunk]:
     embedding_model: type[BaseEmbeddingModel] = get_embedding_model(embedding_model_name)
     # Get query embedding
     provider: EmbeddingBackend = get_embedding_provider(provider=embedding_provider_name)

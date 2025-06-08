@@ -1,14 +1,16 @@
-from icecream import ic
-
 from app.ginarr.llm.router_llm import router_llm
+from app.ginarr.graph_state import GinarrState
+from app.core.logger.app_logger import log
 
-ic.configureOutput(includeContext=True)
 
+async def router_node(state: GinarrState) -> GinarrState:
+    log.info("Entering router_node")
+    user_input = state.get("input", "")
 
-async def router_node(state: dict) -> dict:
-    user_input = state["input"]
     result = await router_llm.ainvoke({"input": user_input})
-    ic(result)
-    state["route"] = result["route"]
 
+    state["route"] = result["route"]
+    log.info(f"Router node set route to [{state['route']}]")
+
+    log.info("Exiting router_node")
     return state

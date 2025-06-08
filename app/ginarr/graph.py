@@ -1,4 +1,3 @@
-from typing import TypedDict, Literal, Any
 from icecream import ic
 import aiosqlite
 
@@ -11,18 +10,9 @@ from app.ginarr.nodes.router import router_node
 from app.ginarr.nodes.memory import memory_node
 from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
+from app.ginarr.graph_state import GinarrState
 
 ic.configureOutput(includeContext=True)
-
-
-class GinarrState(TypedDict, total=False):
-    input: str
-    user_id: int | None
-    route: Literal["memory", "tool", "llm", "write"]
-    fallback_to_llm: bool | None
-    rerouted: bool | None
-    result: dict[str, Any]
-    history: list[dict[str, str]]
 
 
 def end_node(state: GinarrState) -> GinarrState:
@@ -32,24 +22,10 @@ def end_node(state: GinarrState) -> GinarrState:
     Returns:
         (GinarrState) State with cleared fields
     """
-    log.info("--- Entering end_node ---")
-
+    log.info("Entering end_node")
     state.pop("route", None)
-    state.pop("fallback_to_llm", None)
-    state.pop("rerouted", None)
-
-    log.info("--- Exiting end_node ---")
+    log.info("Exiting end_node")
     return state
-
-
-# def should_fallback_to_llm(state: GinarrState) -> str:
-#     log.info("--- Verifying fallback to LLM ---")
-#     if state.get("fallback_to_llm") and not state.get("rerouted"):
-#         log.info("Fallback to LLM is required")
-#         state["rerouted"] = True
-#         return "llm"
-#     log.info("Fallback to LLM is not required")
-#     return "end"
 
 
 async def build_ginarr_graph():

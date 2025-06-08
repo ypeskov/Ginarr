@@ -1,15 +1,19 @@
 ```mermaid
-graph TD    
-    llm_router --> router(router)
+graph TD
+    Router["router"]
+    Memory["memory"]
+    Tool["tool"]
+    LLM["llm"]
+    Summarize["summarize_found_result"]
+    End["end"]
 
-    router -- "route = memory" --> memory(memory)
-    router -- "route = tool" --> tool(tool)
-    router -- "route = llm" --> llm_direct(llm)
+    Router -->|route == 'memory'| Memory
+    Router -->|route == 'tool'| Tool
+    Router -->|route == 'llm'| LLM
 
-    llm_direct --> end_direct(end)
+    Memory --> Summarize
+    Tool --> Summarize
 
-    memory --> llm_summarize(llm)
-    tool --> llm_summarize(llm - summarize found result)
-
-    llm_summarize --> end_direct(The End)
+    LLM --> End
+    Summarize --> End
 ```

@@ -2,16 +2,18 @@ from icecream import ic
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.ginarr.llm.llm_provider import chat_llm
+from app.ginarr.graph_state import GinarrState
+from app.core.logger.app_logger import log
 
 ic.configureOutput(includeContext=True)
 
 
-async def llm_node(state: dict) -> dict:
+async def llm_node(state: GinarrState) -> GinarrState:
+    log.info("Entering llm_node")
     user_input = state.get("input", "")
     history = state.get("history", [])
+
     history.append({"role": "user", "content": user_input})
-    if len(history) > 20:
-        history = history[-20:]
 
     messages = [("system", "Ты помощник. Отвечай на русском. Учитывай весь предыдущий диалог.")] + [
         (h["role"], h["content"]) for h in history
@@ -21,22 +23,25 @@ async def llm_node(state: dict) -> dict:
 
     response = chat_llm.invoke(prompt.invoke({"input": user_input}))
 
-    history.append({"role": "assistant", "content": response.content})
+    history.append({"role": "assistant", "content": str(response.content)})
 
+    # Keep only the last 20 user-assistant pairs (i.e., 40 messages)
+    history = history[-40:]
+
+    # Update state
+    state["history"] = history
     state["result"] = {
         "type": "llm",
         "input": user_input,
         "output": response.content,
     }
 
-    if len(history) > 20:
-        history = history[-20:]
-    state["history"] = history
-
+    log.info("Exiting llm_node")
     return state
 
 
-def summarize_found_result_node(state: dict) -> dict:
+def summarize_found_result_node(state: GinarrState) -> GinarrState:
+    log.info("Entering summarize_found_result_node")
     found_results = state.get("result", {}).get("output", [])
     user_input = state.get("input", "")
     history = state.get("history", [])
@@ -71,4 +76,9 @@ def summarize_found_result_node(state: dict) -> dict:
         "output": response.content,
     }
 
+    history.append({"role": "assistant", "content": str(response.content)})
+    history = history[-40:]
+    state["history"] = history
+
+    log.info("Exiting summarize_found_result_node")
     return state
