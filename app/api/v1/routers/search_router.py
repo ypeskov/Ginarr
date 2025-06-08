@@ -7,6 +7,7 @@ from app.core.database.db import get_db
 from app.dependencies.auth import get_current_user
 from app.services.search.embedding_search import search_embeddings
 from app.models.User import User
+from app.ginarr.ginarr_errors import GinarrGraphCompilationError
 
 router = APIRouter(prefix="/search", tags=["Search"])
 
@@ -24,6 +25,9 @@ async def search_chunks(
             from_date=payload.from_date[0] if payload.from_date else None,
             to_date=payload.to_date[0] if payload.to_date else None,
         )
+    except GinarrGraphCompilationError as e:
+        log.error(f"Error compiling Ginarr graph: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
     except Exception as e:
         log.error(f"Error searching embeddings: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")

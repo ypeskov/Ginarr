@@ -5,7 +5,7 @@ from langchain.chat_models.base import BaseChatModel
 from app.core.logger.app_logger import log
 from app.ginarr.settings import settings as ginarr_settings
 
-ModelProvider = Literal["ollama", "openai", "google", "deepseek"]
+type ModelProvider = Literal["ollama", "openai", "google", "deepseek"]
 
 
 class ModelConfig(TypedDict):

@@ -10,25 +10,16 @@ from app.ginarr.nodes.router import router_node
 from app.ginarr.nodes.memory import memory_node
 from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
+from app.ginarr.nodes.end import end_node
+from app.ginarr.nodes.web_search import web_search_node
 from app.ginarr.graph_state import GinarrState
+from app.ginarr.ginarr_errors import GinarrGraphCompilationError
 
 ic.configureOutput(includeContext=True)
 
 
-def end_node(state: GinarrState) -> GinarrState:
-    """End node. Just clears state.
-    Args:
-        state: (GinarrState) State to clear
-    Returns:
-        (GinarrState) State with cleared fields
-    """
-    log.info("Entering end_node")
-    state.pop("route", None)
-    log.info("Exiting end_node")
-    return state
-
-
 async def build_ginarr_graph():
+    log.info("Building Ginarr graph")
     builder = StateGraph(state_schema=GinarrState)
 
     builder.add_node("router", router_node)
@@ -37,6 +28,7 @@ async def build_ginarr_graph():
     builder.add_node("llm", llm_node)
     builder.add_node("end", end_node)
     builder.add_node("summarize_found_result", summarize_found_result_node)
+    builder.add_node("web_search", web_search_node)
 
     builder.set_entry_point("router")
 
@@ -47,15 +39,25 @@ async def build_ginarr_graph():
             "memory": "memory",
             "tool": "tool",
             "llm": "llm",
+            "web_search": "web_search",
         },
     )
 
     builder.add_edge("memory", "summarize_found_result")
     builder.add_edge("tool", "summarize_found_result")
+    builder.add_edge("web_search", "summarize_found_result")
     builder.add_edge("llm", "end")
     builder.add_edge("summarize_found_result", "end")
+    builder.add_edge("web_search", "summarize_found_result")
 
     conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)
     checkpointer = AsyncSqliteSaver(conn=conn)
 
-    return builder.compile(checkpointer=checkpointer)
+    log.info("Compiling Ginarr graph")
+    try:
+        graph = builder.compile(checkpointer=checkpointer)
+        log.info("Ginarr graph compiled successfully")
+        return graph
+    except Exception as e:
+        log.error(f"Error compiling Ginarr graph: {e}", exc_info=True)
+        raise GinarrGraphCompilationError(f"Error compiling Ginarr graph: {e}")

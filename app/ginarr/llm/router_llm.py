@@ -9,10 +9,24 @@ from app.ginarr.llm.llm_provider import router_selector_llm
 
 ic.configureOutput(includeContext=True)
 
+type RouteName = Literal["memory", "tool", "llm", "web_search"]
+
 
 @tool
-def route_selector(route: Literal["memory", "tool", "llm", "write"]):
-    """Выбирает маршрут: memory (поиск в памяти), tool (вызов инструмента), llm (LLM обработка), write (запись в память)"""
+def route_selector(
+    route: RouteName,
+) -> RouteName:
+    """Selects a route:
+        memory (search in memory),
+        tool (tool call),
+        llm (LLM processing),
+        web_search (web search).
+        If you can't determine the route, return llm.
+    Args:
+        route: (str) Route to select
+    Returns:
+        (str) Route to select
+    """
     return route
 
 
@@ -22,11 +36,12 @@ prompt = ChatPromptTemplate.from_messages(
             "system",
             (
                 "Ты маршрутизатор. Получаешь пользовательский запрос и выбираешь, что с ним делать. "
-                "Ответь только ОДНИМ словом, без пояснений. Возможные опции: memory, tool, llm."
+                "Ответь только ОДНИМ словом, без пояснений. Возможные опции: memory, tool, llm, web_search."
                 "Пояснения: "
                 "memory - поиск в памяти (там находится Postgres + векторный  семантический поиск), "
                 "tool - вызов инструмента, "
                 "llm - вызов LLM, "
+                "web_search - поиск в интернете, "
                 "Если однозначно нельзя определить, то ответь llm."
             ),
         ),
@@ -59,7 +74,7 @@ def create_router_llm(prompt, llm) -> Runnable:
                 pass
         # Fallback: plain text from model
         text = getattr(msg, "content", "").strip().lower()
-        return {"route": text if text in {"memory", "tool", "llm"} else "llm"}
+        return {"route": text if text in {"memory", "tool", "llm", "web_search"} else "llm"}
 
     # Try bind_tools, but fallback gracefully
     try:

@@ -49,7 +49,13 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
 
     found_results_str = "\n\n".join(
         [
-            f"{i + 1}. Text: {result['text']}\nScore: {result['score']:.3f}\nDate: {result['created_at']}"
+            f"{i + 1}. Text: {result['text']}"
+            + (
+                f"\nScore: {result['score']:.3f}"
+                if "score" in result and isinstance(result["score"], (int, float))
+                else ""
+            )
+            + f"\nDate: {result.get('created_at', 'unknown')}"
             for i, result in enumerate(found_results)
         ]
     )

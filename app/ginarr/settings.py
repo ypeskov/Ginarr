@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: SecretStr = SecretStr("sk-proj-123")
     DEEPSEEK_API_KEY: SecretStr = SecretStr("sk-proj-123")
     GOOGLE_API_KEY: SecretStr = SecretStr("sk-proj-123")
+    TAVILY_API_KEY: SecretStr = SecretStr("sk-proj-123")
 
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
