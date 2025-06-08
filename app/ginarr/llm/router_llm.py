@@ -22,12 +22,11 @@ prompt = ChatPromptTemplate.from_messages(
             "system",
             (
                 "Ты маршрутизатор. Получаешь пользовательский запрос и выбираешь, что с ним делать. "
-                "Ответь только ОДНИМ словом, без пояснений. Возможные опции: memory, tool, llm, write."
+                "Ответь только ОДНИМ словом, без пояснений. Возможные опции: memory, tool, llm."
                 "Пояснения: "
                 "memory - поиск в памяти (там находится Postgres + векторный  семантический поиск), "
                 "tool - вызов инструмента, "
                 "llm - вызов LLM, "
-                "write - запись в память."
                 "Если однозначно нельзя определить, то ответь llm."
             ),
         ),
@@ -60,7 +59,7 @@ def create_router_llm(prompt, llm) -> Runnable:
                 pass
         # Fallback: plain text from model
         text = getattr(msg, "content", "").strip().lower()
-        return {"route": text if text in {"memory", "tool", "llm", "write"} else "llm"}
+        return {"route": text if text in {"memory", "tool", "llm"} else "llm"}
 
     # Try bind_tools, but fallback gracefully
     try:

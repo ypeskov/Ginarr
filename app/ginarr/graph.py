@@ -22,6 +22,7 @@ class GinarrState(TypedDict, total=False):
     fallback_to_llm: bool | None
     rerouted: bool | None
     result: dict[str, Any]
+    history: list[dict[str, str]]
 
 
 def end_node(state: GinarrState) -> GinarrState:
