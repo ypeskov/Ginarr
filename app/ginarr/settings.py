@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.0
     LLM_USE_LOCAL: bool = True
 
+    MEMORY_RELEVANCE_THRESHOLD: float = 0.4
+
     MEMORY_SQLITE_PATH: Path = Path(__file__).parent / "memory.sqlite"
 
     model_config = SettingsConfigDict(env_file=Path(__file__).parent / ".env.ginarr", env_file_encoding="utf-8")
