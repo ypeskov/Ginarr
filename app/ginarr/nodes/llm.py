@@ -1,4 +1,8 @@
+from icecream import ic
+
 from app.ginarr.llm.llm_provider import chat_llm
+
+ic.configureOutput(includeContext=True)
 
 
 async def llm_node(state: dict) -> dict:

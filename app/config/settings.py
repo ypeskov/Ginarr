@@ -5,6 +5,7 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 class Settings(BaseSettings):
     ENVIRONMENT: str = "prod"
     FRONTEND_URL: str = "https://ginarr.ai"
+    DEBUG: bool = False
 
     DB_USER: str = "username"
     DB_PASSWORD: str = "userpassword"

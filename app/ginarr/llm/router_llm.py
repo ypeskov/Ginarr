@@ -32,6 +32,20 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
+def safe_bind_tools(llm, tools, tool_choice=None):
+    """Safe bind tools to LLM
+    Args:
+       llm: (BaseChatModel) LLM to bind tools to
+       tools: (list) List of tools to bind
+       tool_choice: (str) Tool choice to use
+    Returns:
+       (BaseChatModel) LLM with tools bound
+    """
+    if getattr(llm, "supports_tools", False) and hasattr(llm, "bind_tools"):
+        return llm.bind_tools(tools, tool_choice=tool_choice)
+    return llm
+
+
 def create_router_llm(prompt, llm) -> Runnable:
     def extract_route(msg) -> dict:
         # OpenAI-style tool calling
@@ -46,8 +60,7 @@ def create_router_llm(prompt, llm) -> Runnable:
 
     # Try bind_tools, but fallback gracefully
     try:
-        if hasattr(llm, "bind_tools"):
-            llm = llm.bind_tools([route_selector], tool_choice="route_selector")
+        llm = safe_bind_tools(llm, [route_selector], tool_choice="route_selector")
     except Exception:
         pass
 
