@@ -2,22 +2,23 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger.app_logger import log
-from app.api.v1.schemas.search_schema import SearchQuery
+from app.api.v1.schemas.search_schema import SearchQuerySchema, SearchResultSchema
 from app.core.database.db import get_db
 from app.dependencies.auth import get_current_user
 from app.services.search.embedding_search import search_embeddings
 from app.models.User import User
 from app.ginarr.ginarr_errors import GinarrGraphCompilationError
+from app.models.MemoryChunk import MemoryChunk
 
 router = APIRouter(prefix="/search", tags=["Search"])
 
 
 @router.post("/")
 async def search_chunks(
-    payload: SearchQuery, db_session: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)
-):
+    payload: SearchQuerySchema, db_session: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)
+) -> list[SearchResultSchema]:
     try:
-        search_results = await search_embeddings(
+        search_results: list[MemoryChunk] = await search_embeddings(
             db_session=db_session,
             user_id=user.id,
             query=payload.query,
@@ -32,4 +33,4 @@ async def search_chunks(
         log.error(f"Error searching embeddings: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    return search_results
+    return [SearchResultSchema.model_validate(chunk) for chunk in search_results]

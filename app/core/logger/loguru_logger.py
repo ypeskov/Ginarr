@@ -1,6 +1,9 @@
-# app_log_loguru.py
-from loguru import logger
 import sys
+from typing import Any
+
+from loguru import logger
+
+my_logger: Any = logger
 
 # Important: remove the default Loguru handler to have full control over logging.
 # Otherwise, if you add your own handlers later, messages will be duplicated.
@@ -11,10 +14,10 @@ logger.remove()
 logger.add(
     sys.stderr,
     format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
-    level="INFO", # Minimum logging level for this handler
-    diagnose=True, # Enables extended diagnostics for errors (very useful in development)
-    backtrace=True, # Enables full call stack for errors
-    colorize=True # Enables console colors
+    level="INFO",  # Minimum logging level for this handler
+    diagnose=True,  # Enables extended diagnostics for errors (very useful in development)
+    backtrace=True,  # Enables full call stack for errors
+    colorize=True,  # Enables console colors
 )
 
 # If needed, you can add a handler for writing logs to a file
@@ -44,5 +47,6 @@ logger.add(
 # Export the configured logger to be used by other parts of the application
 log = logger
 
-def get_logger():
+
+def get_logger() -> Any:
     return log

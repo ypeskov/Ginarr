@@ -20,7 +20,7 @@ async def store_memory_endpoint(
     memory_in: MemoryCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-):
+) -> MemoryOut:
     log.info(f"Storing memory chunk for user [{user.id}] with content [{memory_in.content[:100]}...]")
     try:
         return await store_memory(db, user_id=user.id, content=memory_in.content)

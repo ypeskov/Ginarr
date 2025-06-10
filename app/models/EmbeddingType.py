@@ -36,5 +36,5 @@ class EmbeddingType(Base):
         TIMESTAMP(timezone=True), onupdate=func.now(), server_default=func.now()
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<EmbeddingType(id={self.id}, name='{self.name}')>"

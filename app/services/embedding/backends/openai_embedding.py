@@ -1,5 +1,6 @@
-from openai import AsyncOpenAI
 import tiktoken
+from openai import AsyncOpenAI
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.embedding.embedding_errors import EmbeddingGetError
 from app.config.settings import settings
@@ -57,6 +58,11 @@ class OpenAIEmbeddingBackend(EmbeddingBackend):
         return chunks
 
     async def save_embeddings(
-        self, db_session, memory_chunk_id: int, embeddings: list[list[float]], model: str, embedding_type_id: int
+        self,
+        db_session: AsyncSession,
+        memory_chunk_id: int,
+        embeddings: list[list[float]],
+        model: str,
+        embedding_type_id: int,
     ) -> bool:
         return True

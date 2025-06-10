@@ -4,7 +4,7 @@ import structlog
 
 # Configure standard logging, since structlog uses it
 logging.basicConfig(
-    format="%(message)s", # Structlog will format it, here is the minimum
+    format="%(message)s",  # Structlog will format it, here is the minimum
     stream=sys.stderr,
     level=logging.INFO,
 )
@@ -24,9 +24,10 @@ structlog.configure(
 )
 
 # Export the configured logger
-log = structlog.get_logger()
+log: structlog.stdlib.BoundLogger = structlog.get_logger()
 
-def get_logger():
+
+def get_logger() -> structlog.stdlib.BoundLogger:
     """
     Get the logger for the app.
     This is a wrapper around the structlog.get_logger() function.

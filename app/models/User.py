@@ -22,7 +22,7 @@ class User(Base):
         TIMESTAMP(timezone=True), default=datetime.now, onupdate=datetime.now, server_default=func.now()
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"User(id={self.id}, email={self.email}, first_name={self.first_name}, "
             f"last_name={self.last_name}, is_active={self.is_active}, "

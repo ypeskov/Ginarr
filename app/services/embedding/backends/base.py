@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 class EmbeddingBackend(ABC):
     @abstractmethod
@@ -13,7 +15,7 @@ class EmbeddingBackend(ABC):
     @abstractmethod
     async def save_embeddings(
         self,
-        db_session,
+        db_session: AsyncSession,
         memory_chunk_id: int,
         embeddings: list[list[float]],
         model: str,

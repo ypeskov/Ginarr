@@ -13,7 +13,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
+async def register(data: UserRegister, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user = await auth_service.register_user(data, db)
     except UserAlreadyExists:
@@ -23,7 +23,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login")
-async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
+async def login(data: UserLogin, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user = await auth_service.authenticate_user(data, db)
         if not user:
@@ -42,7 +42,7 @@ async def change_password(
     data: ChangePassword,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> dict:
     try:
         await auth_service.change_password(current_user, data, db)
     except InvalidPassword:
@@ -55,7 +55,7 @@ async def change_password(
 
 
 @router.get("/me")
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user)) -> dict:
     log.info(f"Getting current user: {current_user}")
     return {
         "id": current_user.id,

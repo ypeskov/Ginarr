@@ -1,3 +1,5 @@
+from typing import Any
+
 from icecream import ic
 import aiosqlite
 
@@ -18,7 +20,7 @@ from app.ginarr.ginarr_errors import GinarrGraphCompilationError
 ic.configureOutput(includeContext=True)
 
 
-async def build_ginarr_graph():
+async def build_ginarr_graph() -> Any:
     log.info("Building Ginarr graph")
     builder = StateGraph(state_schema=GinarrState)
 

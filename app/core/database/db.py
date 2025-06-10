@@ -1,3 +1,5 @@
+from typing import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 from app.config.settings import settings as s
@@ -14,6 +16,6 @@ Base = declarative_base()
 log.info("Database connected")
 
 
-async def get_db():  # pragma: no cover
+async def get_db() -> AsyncGenerator[AsyncSession, None]:  # pragma: no cover
     async with SessionLocal() as db:
         yield db
