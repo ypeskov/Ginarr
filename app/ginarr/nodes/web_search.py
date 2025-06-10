@@ -1,9 +1,13 @@
 import httpx
 from datetime import datetime, timezone
 
+from icecream import ic
+
 from app.ginarr.graph_state import GinarrState
 from app.ginarr.settings import settings
 from app.core.logger.app_logger import log
+
+ic.configureOutput(includeContext=True)
 
 TAVILY_URL = "https://api.tavily.com/search"
 
@@ -32,7 +36,6 @@ async def web_search_node(state: GinarrState) -> GinarrState:
         return state
 
     results = data.get("results", [])
-    log.debug(f"Tavily returned {len(results)} results")
 
     state["result"] = {
         "type": "web_search",
