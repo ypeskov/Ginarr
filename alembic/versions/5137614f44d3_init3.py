@@ -1,8 +1,8 @@
-"""EmbeddingType, MemoryChunk, OpenAIEmbedding
+"""init3
 
-Revision ID: 9614ec4beebc
-Revises: 5bf5c9f1e2f3
-Create Date: 2025-05-31 22:46:43.132156
+Revision ID: 5137614f44d3
+Revises:
+Create Date: 2025-06-11 13:37:02.619145
 
 """
 
@@ -14,8 +14,8 @@ import pgvector
 
 
 # revision identifiers, used by Alembic.
-revision: str = "9614ec4beebc"
-down_revision: Union[str, None] = "5bf5c9f1e2f3"
+revision: str = "5137614f44d3"
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -52,6 +52,49 @@ def upgrade() -> None:
         sa.UniqueConstraint("name"),
     )
     op.create_table(
+        "users",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("email", sa.String(), nullable=False),
+        sa.Column("first_name", sa.String(), nullable=False),
+        sa.Column("last_name", sa.String(), nullable=False),
+        sa.Column("hashed_password", sa.String(), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False),
+        sa.Column("created_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
+    op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
+    op.create_table(
+        "chat_messages",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column(
+            "role", sa.Enum("USER", "ASSISTANT", "SYSTEM", "TOOL", "MEMORY", name="chat_message_role"), nullable=False
+        ),
+        sa.Column("content", sa.String(), nullable=False),
+        sa.Column(
+            "answer_generated_by",
+            sa.Enum("LLM", "WEB_SEARCH", "TOOL", "MEMORY", "USER_INPUT", name="answer_generated_by"),
+            nullable=True,
+        ),
+        sa.Column("langgraph_thread_id", sa.String(), nullable=False),
+        sa.Column("preserved", sa.Boolean(), nullable=False),
+        sa.Column(
+            "preserved_by", sa.Enum("MANUAL", "MODE", "SUGGESTED", name="chat_message_preserved_by"), nullable=True
+        ),
+        sa.Column("created_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["user_id"],
+            ["users.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(
+        op.f("ix_chat_messages_langgraph_thread_id"), "chat_messages", ["langgraph_thread_id"], unique=False
+    )
+    op.create_table(
         "memory_chunks",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
@@ -69,7 +112,7 @@ def upgrade() -> None:
         "openai_embeddings",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("chunk_id", sa.Integer(), nullable=False),
-        sa.Column("embedding", pgvector.sqlalchemy.vector.VECTOR(dim=3072), nullable=False),
+        sa.Column("embedding", pgvector.sqlalchemy.vector.VECTOR(dim=3072), nullable=False),  # type: ignore
         sa.Column("embedding_model_name", sa.String(length=100), nullable=False),
         sa.Column("embedding_type_id", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.TIMESTAMP(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -90,5 +133,10 @@ def downgrade() -> None:
     op.drop_table("openai_embeddings")
     op.drop_index(op.f("ix_memory_chunks_user_id"), table_name="memory_chunks")
     op.drop_table("memory_chunks")
+    op.drop_index(op.f("ix_chat_messages_langgraph_thread_id"), table_name="chat_messages")
+    op.drop_table("chat_messages")
+    op.drop_index(op.f("ix_users_id"), table_name="users")
+    op.drop_index(op.f("ix_users_email"), table_name="users")
+    op.drop_table("users")
     op.drop_table("embedding_types")
     # ### end Alembic commands ###
