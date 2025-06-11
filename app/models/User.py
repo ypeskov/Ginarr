@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
 
-from sqlalchemy import TIMESTAMP, func
+from sqlalchemy import TIMESTAMP, JSON, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database.db import Base
 
@@ -18,6 +18,7 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
+    settings: Mapped[dict] = mapped_column(JSON, default={"locale": "ru_UA"}, server_default='{"locale": "ru_UA"}')
 
     chat_messages: Mapped[list["ChatMessage"]] = relationship("ChatMessage", back_populates="user")
 

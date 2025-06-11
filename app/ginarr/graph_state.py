@@ -9,3 +9,5 @@ class GinarrState(TypedDict, total=False):
     route: RouteName
     result: dict[str, Any]
     history: list[dict[str, str]]
+    user_settings: dict[str, Any]
+    context: str

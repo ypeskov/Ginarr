@@ -5,6 +5,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.models.User import User
+from app.ginarr.graph_state import GinarrState
 
 ic.configureOutput(includeContext=True)
 
@@ -12,15 +13,16 @@ ic.configureOutput(includeContext=True)
 async def run_ginarr_agent(user_input: str, graph_instance: Runnable, user: User, db_session: AsyncSession) -> dict:
     try:
         checkpoint_tuple = await graph_instance.checkpointer.aget_tuple({"configurable": {"thread_id": str(user.id)}})  # type: ignore
-        state = checkpoint_tuple.checkpoint if checkpoint_tuple else {}
+        state: GinarrState = checkpoint_tuple.checkpoint if checkpoint_tuple else {}
         log.info("Loaded previous state")
     except Exception as e:
         log.error(f"Error loading previous state: {e}", exc_info=True)
-        state = {}
+        state: GinarrState = {}
         log.info("No previous state, starting fresh")
 
     state["input"] = user_input
     state["user_id"] = user.id
+    state["user_settings"] = user.settings or {}
 
     config: RunnableConfig = {
         "configurable": {
