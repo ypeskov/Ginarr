@@ -1,3 +1,4 @@
+import json
 from typing import Literal
 
 from icecream import ic
@@ -8,10 +9,11 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 
 from app.ginarr.llm.llm_provider import router_selector_llm
+from app.core.i18n.prompts import get_prompt
 
 ic.configureOutput(includeContext=True)
 
-type RouteName = Literal["memory", "tool", "llm", "web_search"]
+type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize"]
 
 
 @tool
@@ -23,6 +25,7 @@ def route_selector(
         tool (tool call),
         llm (LLM processing),
         web_search (web search).
+        memorize (memorize conversation).
         If you can't determine the route, return llm.
     Args:
         route: (str) Route to select
@@ -34,19 +37,7 @@ def route_selector(
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        (
-            "system",
-            (
-                "Ты маршрутизатор. Получаешь пользовательский запрос и выбираешь, что с ним делать. "
-                "Ответь только ОДНИМ словом, без пояснений. Возможные опции: memory, tool, llm, web_search."
-                "Пояснения: "
-                "memory - поиск в памяти (там находится Postgres + векторный  семантический поиск), "
-                "tool - вызов инструмента, "
-                "llm - вызов LLM, "
-                "web_search - поиск в интернете, "
-                "Если однозначно нельзя определить, то ответь llm."
-            ),
-        ),
+        ("system", get_prompt("router.llm.route_selector")),
         ("user", "{input}"),
     ]
 )
@@ -68,15 +59,28 @@ def safe_bind_tools(llm: BaseChatModel, tools: list[BaseTool], tool_choice: str 
 
 def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnable:
     def extract_route(msg: AIMessage) -> dict:
-        # OpenAI-style tool calling
+        # ✅ OpenAI-style tool calling
         if hasattr(msg, "tool_calls") and msg.tool_calls:
             try:
-                return {"route": msg.tool_calls[0]["args"]["route"]}
+                args = msg.tool_calls[0]["args"]
+                return {"route": args["route"]}
             except Exception:
                 pass
-        # Fallback: plain text from model
-        text = getattr(msg, "content", "").strip().lower()
-        return {"route": text if text in {"memory", "tool", "llm", "web_search"} else "llm"}
+
+        # ✅ JSON string (LLaMA-style)
+        text = getattr(msg, "content", "").strip()
+        try:
+            parsed = json.loads(text)
+            if isinstance(parsed, dict) and "route" in parsed:
+                return parsed
+        except Exception:
+            pass
+
+        # 🧯 Fallback: plain string match
+        text_lower = text.lower()
+        fallback = {"route": text_lower if text_lower in {"memory", "tool", "llm", "web_search", "memorize"} else "llm"}
+
+        return fallback
 
     # Try bind_tools, but fallback gracefully
     try:
@@ -84,7 +88,9 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
     except Exception:
         pass
 
-    return prompt | llm | RunnableLambda(extract_route)
+    route_result = prompt | llm | RunnableLambda(extract_route)
+
+    return route_result
 
 
 router_llm = create_router_llm(prompt, router_selector_llm)

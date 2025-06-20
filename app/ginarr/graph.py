@@ -14,6 +14,7 @@ from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
 from app.ginarr.nodes.end import end_node
 from app.ginarr.nodes.web_search import web_search_node
+from app.ginarr.nodes.memorize import memorize_node
 from app.ginarr.graph_state import GinarrState
 from app.ginarr.ginarr_errors import GinarrGraphCompilationError
 
@@ -31,6 +32,7 @@ async def build_ginarr_graph() -> Any:
     builder.add_node("end", end_node)
     builder.add_node("summarize_found_result", summarize_found_result_node)
     builder.add_node("web_search", web_search_node)
+    builder.add_node("memorize", memorize_node)
 
     builder.set_entry_point("router")
 
@@ -42,6 +44,7 @@ async def build_ginarr_graph() -> Any:
             "tool": "tool",
             "llm": "llm",
             "web_search": "web_search",
+            "memorize": "memorize",
         },
     )
 
@@ -51,6 +54,7 @@ async def build_ginarr_graph() -> Any:
     builder.add_edge("llm", "end")
     builder.add_edge("summarize_found_result", "end")
     builder.add_edge("web_search", "summarize_found_result")
+    builder.add_edge("memorize", "end")
 
     conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)
     checkpointer = AsyncSqliteSaver(conn=conn)

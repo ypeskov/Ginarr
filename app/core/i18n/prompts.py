@@ -1,4 +1,5 @@
 import importlib
+from jinja2 import Template
 from app.core.logger.app_logger import log
 
 _PROMPTS = {}
@@ -21,4 +22,4 @@ def get_prompt(key: str, locale: str = "ru_UA", **kwargs) -> str:
     template = _PROMPTS[locale].get(key)
     if template is None:
         raise KeyError(f"Prompt '{key}' not found in locale [{locale}]")
-    return template.format(**kwargs)
+    return Template(template).render(**kwargs)

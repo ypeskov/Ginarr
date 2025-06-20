@@ -1,6 +1,13 @@
-from typing import TypedDict, Any
+from typing import TypedDict, Any, Literal
 
 from app.ginarr.llm.router_llm import RouteName
+
+
+class MemorizePayload(TypedDict, total=False):
+    memorize_scope: Literal["recent", "period", "filtered"]
+    memorize_n: int
+    memorize_period: str
+    memorize_topic: str
 
 
 class GinarrState(TypedDict, total=False):
@@ -11,3 +18,4 @@ class GinarrState(TypedDict, total=False):
     history: list[dict[str, str]]
     user_settings: dict[str, Any]
     context: str
+    route_payload: MemorizePayload

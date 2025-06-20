@@ -1,3 +1,4 @@
+from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger.app_logger import log
@@ -5,6 +6,8 @@ from app.models.MemoryChunk import MemoryChunk
 from app.services.memory.memory_errors import MemoryAddError
 from app.services.embedding.embedding_service import generate_embeddings_from_memory_chunk
 from app.services.embedding.embedding_errors import EmbeddingSaveError
+
+ic.configureOutput(includeContext=True)
 
 
 async def store_memory(db: AsyncSession, user_id: int, content: str) -> MemoryChunk:
@@ -19,6 +22,7 @@ async def store_memory(db: AsyncSession, user_id: int, content: str) -> MemoryCh
     """
     log.info(f"Storing memory chunk for user [{user_id}] with content [{content[:100]}...]")
     memory = MemoryChunk(user_id=user_id, content=content)
+
     try:
         db.add(memory)
         await db.commit()
