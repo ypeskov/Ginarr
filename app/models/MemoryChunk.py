@@ -1,9 +1,18 @@
 from datetime import datetime
+from enum import Enum
 
-from sqlalchemy import ForeignKey, Text, TIMESTAMP, func
+from sqlalchemy import ForeignKey, Text, TIMESTAMP, func, Enum as SqlAlchemyEnum, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database.db import Base
 from app.models.User import User
+
+
+class MemorySourceType(str, Enum):
+    CHAT_MESSAGE = "chat_message"
+    EMAIL = "email"
+    TELEGRAM = "telegram"
+    WHATSAPP = "whatsapp"
+    SLACK = "slack"
 
 
 class MemoryChunk(Base):
@@ -14,6 +23,9 @@ class MemoryChunk(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     user: Mapped[User] = relationship("User", back_populates="memory_chunks")
+
+    source_type: Mapped[MemorySourceType] = mapped_column(SqlAlchemyEnum(MemorySourceType), nullable=True)
+    source_id: Mapped[int] = mapped_column(Integer, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

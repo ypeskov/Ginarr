@@ -8,6 +8,6 @@ ic.configureOutput(includeContext=True)
 
 async def memorize_node(state: dict, config: RunnableConfig) -> dict:
     log.info("Entering memorize_node")
-    # ic(state)
+    ic(state["route_payload"])
     log.info("Exiting memorize_node")
     return state
