@@ -8,20 +8,6 @@ from app.ginarr.settings import settings as ginarr_settings
 type ModelProvider = Literal["ollama", "openai", "google", "deepseek"]
 
 
-class ModelConfig(TypedDict):
-    provider: ModelProvider
-
-
-MODEL_REGISTRY: dict[str, ModelConfig] = {
-    "mistral": {"provider": "ollama"},
-    "llama3": {"provider": "ollama"},
-    "gpt-4": {"provider": "openai"},
-    "gpt-4o": {"provider": "openai"},
-    "gemini-pro": {"provider": "google"},
-    "deepseek-chat": {"provider": "deepseek"},
-}
-
-
 def create_llm(model_name: str) -> BaseChatModel:
     """
     Create an LLM instance for the given model name.
@@ -30,47 +16,30 @@ def create_llm(model_name: str) -> BaseChatModel:
     Returns:
         (BaseChatModel) An LLM instance
     """
-    if model_name not in MODEL_REGISTRY:
-        raise ValueError(f"Model '{model_name}' is not registered in MODEL_REGISTRY")
+    try:
+        log.info(f"Initializing LLM with model: '{model_name}'")
 
-    model_cfg = MODEL_REGISTRY[model_name]
-    provider = model_cfg["provider"]
+        provider = model_name.split(":")[0]
 
-    log.info(f"Using model '{model_name}' from provider '{provider}'")
+        provider_api_keys = {
+            "openai": ginarr_settings.OPENAI_API_KEY,
+            "google": ginarr_settings.GOOGLE_API_KEY,
+            "deepseek": ginarr_settings.DEEPSEEK_API_KEY,
+        }
 
-    match provider:
-        case "ollama":
-            if ginarr_settings.LLM_USE_LOCAL:
-                return init_chat_model(
-                    f"ollama:{model_name}",
-                    config={
-                        "base_url": ginarr_settings.OLLAMA_BASE_URL,
-                        "temperature": ginarr_settings.LLM_TEMPERATURE,
-                    },
-                )
-            else:
-                raise ValueError("Remote (non-local) usage of Ollama models is not supported")
-        case "openai":
-            return init_chat_model(
-                f"openai:{model_name}",
-                temperature=ginarr_settings.LLM_TEMPERATURE,
-                openai_api_key=ginarr_settings.OPENAI_API_KEY,
-            )
-        case "google":
-            return init_chat_model(
-                f"google:{model_name}",
-                temperature=ginarr_settings.LLM_TEMPERATURE,
-                google_api_key=ginarr_settings.GOOGLE_API_KEY,
-            )
-        case "deepseek":
-            return init_chat_model(
-                f"openai:{model_name}",
-                temperature=ginarr_settings.LLM_TEMPERATURE,
-                openai_api_key=ginarr_settings.DEEPSEEK_API_KEY,
-                base_url=ginarr_settings.DEEPSEEK_BASE_URL,
-            )
-        case _:
-            raise ValueError(f"Unsupported model provider: {provider}")
+        kwargs = {
+            "temperature": ginarr_settings.LLM_TEMPERATURE,
+            "api_key": provider_api_keys.get(provider),
+        }
+
+        if provider == "ollama":
+            kwargs["base_url"] = ginarr_settings.OLLAMA_BASE_URL
+
+        return init_chat_model(model_name, **kwargs)
+
+    except Exception as e:
+        log.error(f"Failed to initialize model '{model_name}': {e}")
+        raise ValueError(f"Could not create LLM for '{model_name}'") from e
 
 
 router_selector_llm = create_llm(ginarr_settings.LLM_MODEL)
