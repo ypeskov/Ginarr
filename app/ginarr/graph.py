@@ -3,7 +3,7 @@ from typing import Any
 from icecream import ic
 import aiosqlite
 
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from app.ginarr.settings import settings as ginarr_settings
@@ -12,7 +12,7 @@ from app.ginarr.nodes.router import router_node
 from app.ginarr.nodes.memory import memory_node
 from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
-from app.ginarr.nodes.end import end_node
+from app.ginarr.nodes.end import end_node as custom_end_node
 from app.ginarr.nodes.web_search import web_search_node
 from app.ginarr.nodes.memorize import memorize_node
 from app.ginarr.graph_state import GinarrState
@@ -29,7 +29,7 @@ async def build_ginarr_graph() -> Any:
     builder.add_node("memory", memory_node)
     builder.add_node("tool", tool_node)
     builder.add_node("llm", llm_node)
-    builder.add_node("end", end_node)
+    builder.add_node("custom_end", custom_end_node)
     builder.add_node("summarize_found_result", summarize_found_result_node)
     builder.add_node("web_search", web_search_node)
     builder.add_node("memorize", memorize_node)
@@ -51,10 +51,11 @@ async def build_ginarr_graph() -> Any:
     builder.add_edge("memory", "summarize_found_result")
     builder.add_edge("tool", "summarize_found_result")
     builder.add_edge("web_search", "summarize_found_result")
-    builder.add_edge("llm", "end")
-    builder.add_edge("summarize_found_result", "end")
+    builder.add_edge("llm", "custom_end")
+    builder.add_edge("summarize_found_result", "custom_end")
     builder.add_edge("web_search", "summarize_found_result")
-    builder.add_edge("memorize", "end")
+    builder.add_edge("memorize", "custom_end")
+    builder.add_edge("custom_end", END)
 
     conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)
     checkpointer = AsyncSqliteSaver(conn=conn)

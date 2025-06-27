@@ -14,7 +14,7 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     Args:
         state: (GinarrState) State to clear
     Returns:
-        (GinarrState) State with cleared fields
+        GinarrState: State with cleared fields
     """
     log.info("Entering end_node")
 
