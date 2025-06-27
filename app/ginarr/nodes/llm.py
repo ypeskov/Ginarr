@@ -35,6 +35,7 @@ async def llm_node(state: GinarrState) -> GinarrState:
         "input": user_input,
         "output": response.content,
     }
+    ic(state.keys())
 
     log.info("Exiting llm_node")
     return state
@@ -42,6 +43,7 @@ async def llm_node(state: GinarrState) -> GinarrState:
 
 def summarize_found_result_node(state: GinarrState) -> GinarrState:
     log.info("Entering summarize_found_result_node")
+    ic(state.keys())
 
     found_results = state.get("result", {}).get("output", [])
     user_input = state.get("input", "")
@@ -64,15 +66,24 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
 
     messages = [
         ("system", get_prompt("router.memory.summary")),
-        ("user", get_prompt("router.llm.context", context=previous_context)),
-        ("user", get_prompt("router.summary.prompt.user", user_input=user_input)),
-        ("user", get_prompt("router.summary.prompt.found_results", found_results_str=found_results_str)),
+        ("user", get_prompt("router.llm.context")),
+        ("user", get_prompt("router.summary.prompt.user")),
+        ("user", get_prompt("router.summary.prompt.found_results")),
     ]
 
     prompt = ChatPromptTemplate.from_messages(messages)
 
     start_time = time.time()
-    response = chat_llm.invoke(prompt.invoke({"input": found_results_str}))
+    response = chat_llm.invoke(
+        prompt.invoke(
+            {
+                "input": found_results_str,
+                "user_input": user_input,
+                "context": previous_context,
+                "found_results_str": found_results_str,
+            }
+        )
+    )
     end_time = time.time()
     log.info(f"Time taken to summarize: {end_time - start_time} seconds")
 

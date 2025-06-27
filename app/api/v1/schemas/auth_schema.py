@@ -6,7 +6,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     first_name: str
     last_name: str
-    password: Annotated[str, StringConstraints(min_length=8)]
+    password: Annotated[str, StringConstraints(min_length=3)]
 
 
 class UserLogin(BaseModel):
@@ -16,4 +16,4 @@ class UserLogin(BaseModel):
 
 class ChangePassword(BaseModel):
     old_password: str
-    new_password: Annotated[str, StringConstraints(min_length=8)]
+    new_password: Annotated[str, StringConstraints(min_length=3)]

@@ -1,5 +1,5 @@
 import importlib
-from jinja2 import Template
+
 from app.core.logger.app_logger import log
 
 _PROMPTS = {}
@@ -16,10 +16,10 @@ def load_prompts(locale: str) -> dict:
         return fallback_mod.PROMPTS
 
 
-def get_prompt(key: str, locale: str = "ru_UA", **kwargs) -> str:
+def get_prompt(key: str, locale: str = "ru_UA") -> str:
     if locale not in _PROMPTS:
         _PROMPTS[locale] = load_prompts(locale)
     template = _PROMPTS[locale].get(key)
     if template is None:
         raise KeyError(f"Prompt '{key}' not found in locale [{locale}]")
-    return Template(template).render(**kwargs)
+    return template
