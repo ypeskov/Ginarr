@@ -35,7 +35,6 @@ async def llm_node(state: GinarrState) -> GinarrState:
         "input": user_input,
         "output": response.content,
     }
-    ic(state.keys())
 
     log.info("Exiting llm_node")
     return state
@@ -43,7 +42,6 @@ async def llm_node(state: GinarrState) -> GinarrState:
 
 def summarize_found_result_node(state: GinarrState) -> GinarrState:
     log.info("Entering summarize_found_result_node")
-    ic(state.keys())
 
     found_results = state.get("result", {}).get("output", [])
     user_input = state.get("input", "")

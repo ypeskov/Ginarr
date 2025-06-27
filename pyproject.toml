@@ -9,6 +9,7 @@ dependencies = [
     "alembic>=1.16.1",
     "asyncpg>=0.30.0",
     "bcrypt>=4.3.0",
+    "debugpy>=1.8.14",
     "duckduckgo-search>=8.0.2",
     "fastapi[standard]>=0.115.12",
     "greenlet>=3.2.2",
