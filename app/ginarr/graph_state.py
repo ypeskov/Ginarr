@@ -1,16 +1,22 @@
+from dataclasses import dataclass
 from typing import TypedDict, Any, Literal
 
 from app.ginarr.llm.router_llm import RouteName
 
 
 class MemorizePayload(TypedDict, total=False):
-    memorize_scope: Literal["recent", "period", "filtered"]
+    memorize_scope: Literal[
+        "recent",
+        "period",
+        "filtered",
+    ]
     memorize_n: int
     memorize_period: str
     memorize_topic: str
 
 
-class GinarrState(TypedDict, total=False):
+@dataclass
+class GinarrState:
     input: str
     user_id: int | None
     route: RouteName
@@ -19,3 +25,4 @@ class GinarrState(TypedDict, total=False):
     user_settings: dict[str, Any]
     context: str
     route_payload: MemorizePayload
+    status: bool = False

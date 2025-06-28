@@ -13,7 +13,7 @@ from app.core.i18n.prompts import get_prompt
 
 ic.configureOutput(includeContext=True)
 
-type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "check_done"]
+type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "custom_end", "llm_reasoning"]
 
 
 @tool
@@ -26,7 +26,7 @@ def route_selector(
         llm (LLM processing),
         web_search (web search).
         memorize (memorize conversation).
-        check_done (check if the conversation is done).
+        custom_end (check if the conversation is done).
         If you can't determine the route, return llm.
     Args:
         route: (str) Route to select

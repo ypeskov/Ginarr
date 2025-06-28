@@ -10,12 +10,10 @@ from app.core.i18n.prompts import get_prompt
 def check_done_node(state: GinarrState) -> GinarrState:
     log.info("Entering check_done_node")
 
-    user_input = state.get("status", "")
-
-    if user_input == "done":
-        state["route"] = "custom_end"
+    if state.status:
+        state.route = "custom_end"
     else:
-        state["route"] = "router"
+        state.route = "llm_reasoning"
 
     log.info("Exiting check_done_node")
     return state
