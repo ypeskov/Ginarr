@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.ginarr.nodes.check_done import check_done_node
 from icecream import ic
 import aiosqlite
 
@@ -33,6 +34,7 @@ async def build_ginarr_graph() -> Any:
     builder.add_node("summarize_found_result", summarize_found_result_node)
     builder.add_node("web_search", web_search_node)
     builder.add_node("memorize", memorize_node)
+    builder.add_node("check_done", check_done_node)
 
     builder.set_entry_point("router")
 
@@ -45,16 +47,25 @@ async def build_ginarr_graph() -> Any:
             "llm": "llm",
             "web_search": "web_search",
             "memorize": "memorize",
+            "check_done": "check_done",
+        },
+    )
+
+    builder.add_conditional_edges(
+        "check_done",
+        lambda state: state.route,
+        {
+            "llm": "llm",
+            "custom_end": "custom_end",
         },
     )
 
     builder.add_edge("memory", "summarize_found_result")
     builder.add_edge("tool", "summarize_found_result")
     builder.add_edge("web_search", "summarize_found_result")
-    builder.add_edge("llm", "custom_end")
-    builder.add_edge("summarize_found_result", "custom_end")
-    builder.add_edge("web_search", "summarize_found_result")
-    builder.add_edge("memorize", "custom_end")
+    builder.add_edge("llm", "check_done")
+    builder.add_edge("summarize_found_result", "check_done")  
+    builder.add_edge("memorize", "check_done")
     builder.add_edge("custom_end", END)
 
     conn = await aiosqlite.connect(ginarr_settings.MEMORY_SQLITE_PATH)

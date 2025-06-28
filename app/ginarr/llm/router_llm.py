@@ -77,9 +77,13 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
         except Exception:
             pass
 
-        # 🧯 Fallback: plain string match
+        # Fallback: plain string match
         text_lower = text.lower()
-        fallback = {"route": text_lower if text_lower in {"memory", "tool", "llm", "web_search", "memorize"} else "llm"}
+        fallback = {
+            "route": text_lower
+            if text_lower in {"memory", "tool", "llm", "web_search", "memorize", "custom_end", "llm_reasoning"}
+            else "llm"
+        }
 
         return fallback
 

@@ -22,18 +22,18 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     if db_session is None:
         raise ValueError("DB session is required")
 
-    user_id = state.get("user_id")
+    user_id = state.user_id
     if user_id is None:
         raise ValueError("User ID is required")
 
-    thread_id = state.get("thread_id", user_id)
+    thread_id = state.user_id
     if thread_id is None:
         raise ValueError("Thread ID is required")
     thread_id = str(thread_id)
 
-    user_input = state.get("input", "")
-    assistant_output = state.get("result", {}).get("output", "")
-    answer_generated_by = state.get("result", {}).get("type", None)
+    user_input = state.input
+    assistant_output = state.result.get("output", "")
+    answer_generated_by = state.result.get("type", None)
 
     await save_chat_message(
         db_session=db_session,
@@ -58,7 +58,7 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
         ),
     )
 
-    state.pop("route", None)
+    state.route = None
     log.info("Exiting end_node")
 
     return state

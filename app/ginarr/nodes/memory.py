@@ -6,6 +6,7 @@ from app.core.logger.app_logger import log
 from app.ginarr.llm.llm_provider import chat_llm
 from app.services.search.embedding_search import search_embeddings
 from app.models.MemoryChunk import MemoryChunk
+from app.ginarr.graph_state import GinarrState
 
 ic.configureOutput(includeContext=True)
 
@@ -21,10 +22,10 @@ relevance_checker = relevance_prompt | chat_llm | RunnableLambda(lambda msg: msg
 
 
 # The node that performs retrieval (RAG) using your embedding backend
-async def memory_node(state: dict, config: RunnableConfig) -> dict:
+async def memory_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     log.info("Entering memory_node")
-    user_input = state.get("input", "")
-    user_id = state.get("user_id", "")
+    user_input = state.input
+    user_id = state.user_id
 
     db_session = config.get("configurable", {}).get("db_session", None)
 
@@ -40,7 +41,7 @@ async def memory_node(state: dict, config: RunnableConfig) -> dict:
         for chunk in results
     ]
 
-    state["result"] = {
+    state.result = {
         "type": "memory",
         "input": user_input,
         "output": matches,

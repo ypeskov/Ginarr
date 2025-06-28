@@ -26,7 +26,6 @@ async def router_node(state: GinarrState) -> GinarrState:
     if "route_payload" in result:
         state.route_payload = MemorizePayload(**result["route_payload"])
 
-    ic(state.route)
     log.info(f"Router node set route to [{state.route}]")
 
     log.info("Exiting router_node")

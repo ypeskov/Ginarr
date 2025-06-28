@@ -15,7 +15,7 @@ TAVILY_URL = "https://api.tavily.com/search"
 async def web_search_node(state: GinarrState) -> GinarrState:
     log.info("Entering web_search_node")
 
-    query = state.get("input")
+    query = state.input
     api_key = settings.TAVILY_API_KEY.get_secret_value()
 
     if not api_key:
@@ -37,7 +37,7 @@ async def web_search_node(state: GinarrState) -> GinarrState:
 
     results = data.get("results", [])
 
-    state["result"] = {
+    state.result = {
         "type": "web_search",
         "input": query,
         "output": [

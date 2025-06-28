@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TypedDict, Any, Literal
 
 from app.ginarr.llm.router_llm import RouteName
@@ -15,14 +15,15 @@ class MemorizePayload(TypedDict, total=False):
     memorize_topic: str
 
 
+
 @dataclass
 class GinarrState:
-    input: str
-    user_id: int | None
-    route: RouteName
-    result: dict[str, Any]
-    history: list[dict[str, str]]
-    user_settings: dict[str, Any]
-    context: str
-    route_payload: MemorizePayload
-    status: bool = False
+    input: str = ""
+    user_id: int | None = None
+    route: RouteName | None = "llm"
+    result: dict[str, Any] = field(default_factory=dict)
+    history: list[dict[str, str]] = field(default_factory=list)
+    user_settings: dict[str, Any] = field(default_factory=dict)
+    context: str = ""
+    route_payload: MemorizePayload = field(default_factory=MemorizePayload)
+    is_done: bool = False
