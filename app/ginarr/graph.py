@@ -13,7 +13,7 @@ from app.ginarr.nodes.end import end_node as custom_end_node
 from app.ginarr.nodes.llm import llm_node, summarize_found_result_node
 from app.ginarr.nodes.memorize import memorize_node
 from app.ginarr.nodes.memory import memory_node
-from app.ginarr.nodes.router import router_node
+from app.ginarr.nodes.router import fallback_router_node, router_node
 from app.ginarr.nodes.tool import tool_node
 from app.ginarr.nodes.web_search import web_search_node
 from app.ginarr.settings import settings as ginarr_settings
@@ -26,6 +26,7 @@ async def build_ginarr_graph() -> Any:
     builder = StateGraph(state_schema=GinarrState)
 
     builder.add_node("router", router_node)
+    builder.add_node("fallback_router", fallback_router_node)
     builder.add_node("memory", memory_node)
     builder.add_node("tool", tool_node)
     builder.add_node("llm", llm_node)
@@ -51,11 +52,26 @@ async def build_ginarr_graph() -> Any:
     )
 
     builder.add_conditional_edges(
+        "fallback_router",
+        lambda state: state.route,
+        {
+            "memory": "memory",
+            "tool": "tool",
+            "llm": "llm",
+            "web_search": "web_search",
+            "memorize": "memorize",
+            "check_done": "check_done",
+        },
+    )
+
+    builder.add_edge("fallback_router", "router")
+
+    builder.add_conditional_edges(
         "check_done",
         lambda state: state.route,
         {
-            "llm": "llm",
             "custom_end": "custom_end",
+            "fallback_router": "fallback_router",
         },
     )
 
@@ -63,7 +79,7 @@ async def build_ginarr_graph() -> Any:
     builder.add_edge("tool", "summarize_found_result")
     builder.add_edge("web_search", "summarize_found_result")
     builder.add_edge("llm", "check_done")
-    builder.add_edge("summarize_found_result", "check_done")  
+    builder.add_edge("summarize_found_result", "check_done")
     builder.add_edge("memorize", "check_done")
     builder.add_edge("custom_end", END)
 

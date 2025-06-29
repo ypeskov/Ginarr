@@ -16,13 +16,14 @@ REGISTERED_TOOLS = {
 # A placeholder tool execution node
 async def tool_node(state: GinarrState) -> GinarrState:
     log.info("Entering tool_node")
-    user_input = state.input
+    tool_name = state.tool_payload.get("tool_name", "")
+    tool_args = state.tool_payload.get("tool_args", {})
 
     # TODO: implement tool execution
-    # TODO: implement tool selection
+    tool_result = REGISTERED_TOOLS[tool_name](**tool_args)
     tool_result = [
         {
-            "text": f"Tool executed with input: {user_input}",
+            "text": tool_result,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "score": 1.0,
         }
@@ -30,7 +31,7 @@ async def tool_node(state: GinarrState) -> GinarrState:
 
     state.result = {
         "type": "tool",
-        "input": user_input,
+        "input": state.input,
         "output": tool_result,
     }
 

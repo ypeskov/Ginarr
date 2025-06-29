@@ -13,7 +13,7 @@ from app.ginarr.llm.llm_provider import chat_llm
 
 ic.configureOutput(includeContext=True)
 
-type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "custom_end", "llm_reasoning"]
+type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "custom_end", "fallback_router"]
 
 ALLOWED_ROUTES = set(get_args(RouteName))
 
@@ -24,6 +24,7 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
+
 def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnable:
     """
     Create a router LLM
@@ -33,6 +34,7 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
     Returns:
         Runnable: The router LLM
     """
+
     def extract_route(msg: AIMessage) -> dict[str, Any]:
         """Extract the route from the message
         Args:
@@ -51,13 +53,12 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
 
         # Fallback: interpret raw text as route name
         text_lower = text.lower()
-        return {
-            "route": text_lower if text_lower in ALLOWED_ROUTES else "llm"
-        }
+        return {"route": text_lower if text_lower in ALLOWED_ROUTES else "llm"}
 
     route_result = prompt | llm | RunnableLambda(extract_route)
 
     return route_result
+
 
 router_llm = create_router_llm(prompt, chat_llm)
 log.info("router_llm created")

@@ -27,16 +27,16 @@ async def llm_node(state: GinarrState) -> GinarrState:
     prompt = ChatPromptTemplate.from_messages(messages)
 
     response = await chat_llm.ainvoke(prompt.invoke({"input": user_input}))
-    
+
     # Handle both single message and message list responses
     content = ""
-    if hasattr(response, 'content'):
+    if hasattr(response, "content"):
         content = str(response.content)
     elif isinstance(response, list) and len(response) > 0:
         content = str(response[0].content)
     else:
         content = str(response)
-    
+
     if content.endswith("[[FINAL_ANSWER]]"):
         state.is_done = True
         content = content.replace("[[FINAL_ANSWER]]", "").strip()
@@ -80,13 +80,20 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
 
         found_results_str += result_str
 
-    messages = [
-        ("system", get_prompt("router.memory.summary")),
-        ("user", get_prompt("router.llm.context")),
-        ("user", get_prompt("router.summary.prompt.user")),
-        ("user", get_prompt("router.summary.prompt.found_results")),
-    ]
-    messages.append(("user", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+    messages = []
+    if state.route == "tool":
+        messages.append(("system", get_prompt("router.tool.summary")))
+        messages.append(("system", get_prompt("router.tool.system_prompt_final_answer_after_tool_result")))
+    elif state.route == "memory":
+        messages.append(("system", get_prompt("router.memory.summary")))
+        messages.append(("system", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+    else:
+        messages.append(("system", get_prompt("router.memory.summary")))
+        messages.append(("system", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+
+    messages.append(("system", get_prompt("router.llm.context")))
+    messages.append(("user", get_prompt("router.summary.prompt.user")))
+    messages.append(("system", get_prompt("router.summary.prompt.found_results")))
 
     prompt = ChatPromptTemplate.from_messages(messages)
 
@@ -103,10 +110,10 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
     )
     end_time = time.time()
     log.info(f"Time taken to summarize: {end_time - start_time} seconds")
-
+    ic(f"Response: {response}")
     # Handle both single message and message list responses
     content = ""
-    if hasattr(response, 'content'):
+    if hasattr(response, "content"):
         content = str(response.content)
     elif isinstance(response, list) and len(response) > 0:
         content = str(response[0].content)
@@ -117,7 +124,15 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
         log.info("Final answer detected")
         state.is_done = True
         content = content.replace("[[FINAL_ANSWER]]", "").strip()
-
+    elif content.endswith("[[NO_DATA]]"):
+        log.info("No data detected")
+        state.is_done = True
+        content = content.replace("[[NO_DATA]]", "").strip()
+    else:
+        log.info("No final answer detected")
+        content = "Пока информации нет, продолжаю поиск"
+        state.is_done = False
+    ic(content)
     state.result = {
         "type": "llm",
         "input": user_input,
