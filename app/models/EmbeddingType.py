@@ -1,10 +1,10 @@
+import enum
 from datetime import datetime
 
-from sqlalchemy import Integer, String, Enum, TIMESTAMP, func
+from sqlalchemy import TIMESTAMP, Enum, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database.db import Base
-import enum
 
 
 class EmbeddingTypeName(str, enum.Enum):

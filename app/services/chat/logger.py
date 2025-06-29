@@ -1,8 +1,8 @@
 from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.ChatMessage import ChatMessage
 from app.core.logger.app_logger import log
+from app.models.ChatMessage import ChatMessage
 
 ic.configureOutput(includeContext=True)
 

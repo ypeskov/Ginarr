@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped
 from pgvector.sqlalchemy import Vector
+from sqlalchemy.orm import Mapped
 
 
 class BaseEmbeddingModel:

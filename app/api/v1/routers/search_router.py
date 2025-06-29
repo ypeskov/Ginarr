@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.logger.app_logger import log
 from app.api.v1.schemas.search_schema import SearchQuerySchema, SearchResultSchema
 from app.core.database.db import get_db
+from app.core.logger.app_logger import log
 from app.dependencies.auth import get_current_user
-from app.services.search.embedding_search import search_embeddings
-from app.models.User import User
 from app.ginarr.ginarr_errors import GinarrGraphCompilationError
 from app.models.MemoryChunk import MemoryChunk
+from app.models.User import User
+from app.services.search.embedding_search import search_embeddings
 
 router = APIRouter(prefix="/search", tags=["Search"])
 

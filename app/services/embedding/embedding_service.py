@@ -2,11 +2,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import settings
 from app.core.logger.app_logger import log
-from app.services.embedding.embedding_errors import EmbeddingSaveError, EmbeddingGetError
-from app.services.embedding.stores.embedding_postgres_store import EmbeddingPostgresStore
 from app.services.embedding.backends.base import EmbeddingBackend
 from app.services.embedding.backends.provider import provide_embedding_backend
+from app.services.embedding.embedding_errors import (
+    EmbeddingGetError,
+    EmbeddingSaveError,
+)
 from app.services.embedding.stores.embedding_base_store import EmbeddingBaseStore
+from app.services.embedding.stores.embedding_postgres_store import (
+    EmbeddingPostgresStore,
+)
 
 
 def get_embedding_provider(provider: str = settings.EMBEDDING_PROVIDER) -> EmbeddingBackend:

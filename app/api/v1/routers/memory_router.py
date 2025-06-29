@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, status
 from icecream import ic
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.schemas.memory_schema import MemoryCreate, MemoryOut
 from app.core.database.db import get_db

@@ -1,11 +1,11 @@
-import httpx
 from datetime import datetime, timezone
 
+import httpx
 from icecream import ic
 
+from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState
 from app.ginarr.settings import settings
-from app.core.logger.app_logger import log
 
 ic.configureOutput(includeContext=True)
 

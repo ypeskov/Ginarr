@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String, TIMESTAMP, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
+from sqlalchemy import TIMESTAMP, ForeignKey, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database.db import Base
-from app.models.EmbeddingType import EmbeddingType
 from app.models.BaseEmbeddingModel import BaseEmbeddingModel
-
+from app.models.EmbeddingType import EmbeddingType
 
 # --- CONSTANTS FOR CLARITY ---
 OPENAI_EMBEDDING_MODEL_ID = "text-embedding-3-large"

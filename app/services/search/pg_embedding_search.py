@@ -1,21 +1,25 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import select, func, cast, Result, desc
-from pgvector.sqlalchemy import Vector
-from sqlalchemy.dialects.postgresql import array
-from icecream import ic
 
+from icecream import ic
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import Result, cast, desc, func, select
+from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config.settings import settings
 from app.core.logger.app_logger import log
-from app.models.MemoryChunk import MemoryChunk
-from app.models.OpenAIEmbedding import OpenAIEmbedding
 from app.models.BaseEmbeddingModel import BaseEmbeddingModel
 from app.models.EmbeddingType import EmbeddingType, EmbeddingTypeName
-from app.services.embedding.embedding_service import get_embedding_provider
-from app.services.embedding.embedding_errors import EmbeddingGetError, EmbeddingModelNotFoundError
-from app.services.embedding.registry.models import AvailableEmbeddingModels
-from app.config.settings import settings
+from app.models.MemoryChunk import MemoryChunk
+from app.models.OpenAIEmbedding import OpenAIEmbedding
 from app.services.embedding.backends.base import EmbeddingBackend
+from app.services.embedding.embedding_errors import (
+    EmbeddingGetError,
+    EmbeddingModelNotFoundError,
+)
+from app.services.embedding.embedding_service import get_embedding_provider
+from app.services.embedding.registry.models import AvailableEmbeddingModels
 
 ic.configureOutput(includeContext=True)
 

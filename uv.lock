@@ -907,7 +907,7 @@ dependencies = [
     { name = "tiktoken" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "debugpy" },
     { name = "isort" },
@@ -933,11 +933,6 @@ dev = [
     { name = "types-ujson" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "isort" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0" },
@@ -946,12 +941,10 @@ requires-dist = [
     { name = "bcrypt", specifier = ">=4.3.0" },
     { name = "dacite", specifier = ">=1.9.2" },
     { name = "debugpy", specifier = ">=1.8.14" },
-    { name = "debugpy", marker = "extra == 'dev'", specifier = ">=1.8.14" },
     { name = "duckduckgo-search", specifier = ">=8.0.2" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
     { name = "greenlet", specifier = ">=3.2.2" },
     { name = "icecream", specifier = ">=2.1.4" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=6.0.1" },
     { name = "langchain", specifier = ">=0.3.25" },
     { name = "langchain-core", specifier = ">=0.3.63" },
     { name = "langchain-ollama", specifier = ">=0.3.3" },
@@ -960,41 +953,43 @@ requires-dist = [
     { name = "langgraph-checkpoint", specifier = ">=2.0.26" },
     { name = "langgraph-checkpoint-sqlite", specifier = ">=2.0.10" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "lxml-stubs", marker = "extra == 'dev'", specifier = ">=0.5.1" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.16.0" },
     { name = "openai", specifier = ">=1.82.1" },
-    { name = "pandas-stubs", marker = "extra == 'dev'", specifier = ">=2.2.3.250527" },
     { name = "passlib", specifier = ">=1.7.4" },
     { name = "pgvector", specifier = ">=0.4.1" },
     { name = "psycopg", specifier = ">=3.2.9" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "python-jose", specifier = ">=3.5.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11.12" },
-    { name = "ruff-lsp", marker = "extra == 'dev'", specifier = ">=0.0.62" },
     { name = "sqlalchemy", specifier = ">=2.0.41" },
     { name = "structlog", specifier = ">=25.3.0" },
     { name = "tavily-python", specifier = ">=0.7.3" },
     { name = "tiktoken", specifier = ">=0.9.0" },
-    { name = "types-beautifulsoup4", marker = "extra == 'dev'", specifier = ">=4.12.0.20250516" },
-    { name = "types-colorama", marker = "extra == 'dev'", specifier = ">=0.4.15.20240311" },
-    { name = "types-defusedxml", marker = "extra == 'dev'", specifier = ">=0.7.0.20250516" },
-    { name = "types-greenlet", marker = "extra == 'dev'", specifier = ">=3.2.0.20250417" },
-    { name = "types-jsonschema", marker = "extra == 'dev'", specifier = ">=4.24.0.20250528" },
-    { name = "types-passlib", marker = "extra == 'dev'", specifier = ">=1.7.7.20250602" },
-    { name = "types-psutil", marker = "extra == 'dev'", specifier = ">=7.0.0.20250601" },
-    { name = "types-psycopg2", marker = "extra == 'dev'", specifier = ">=2.9.21.20250516" },
-    { name = "types-pygments", marker = "extra == 'dev'", specifier = ">=2.19.0.20250516" },
-    { name = "types-python-jose", marker = "extra == 'dev'", specifier = ">=3.5.0.20250531" },
-    { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.12.20250516" },
-    { name = "types-regex", marker = "extra == 'dev'", specifier = ">=2024.11.6.20250403" },
-    { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.32.0.20250602" },
-    { name = "types-tqdm", marker = "extra == 'dev'", specifier = ">=4.67.0.20250516" },
-    { name = "types-ujson", marker = "extra == 'dev'", specifier = ">=5.10.0.20250326" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "isort", specifier = ">=6.0.1" }]
+dev = [
+    { name = "debugpy", specifier = ">=1.8.14" },
+    { name = "isort", specifier = ">=6.0.1" },
+    { name = "lxml-stubs", specifier = ">=0.5.1" },
+    { name = "mypy", specifier = ">=1.16.0" },
+    { name = "pandas-stubs", specifier = ">=2.2.3.250527" },
+    { name = "ruff", specifier = ">=0.11.12" },
+    { name = "ruff-lsp", specifier = ">=0.0.62" },
+    { name = "types-beautifulsoup4", specifier = ">=4.12.0.20250516" },
+    { name = "types-colorama", specifier = ">=0.4.15.20240311" },
+    { name = "types-defusedxml", specifier = ">=0.7.0.20250516" },
+    { name = "types-greenlet", specifier = ">=3.2.0.20250417" },
+    { name = "types-jsonschema", specifier = ">=4.24.0.20250528" },
+    { name = "types-passlib", specifier = ">=1.7.7.20250602" },
+    { name = "types-psutil", specifier = ">=7.0.0.20250601" },
+    { name = "types-psycopg2", specifier = ">=2.9.21.20250516" },
+    { name = "types-pygments", specifier = ">=2.19.0.20250516" },
+    { name = "types-python-jose", specifier = ">=3.5.0.20250531" },
+    { name = "types-pyyaml", specifier = ">=6.0.12.20250516" },
+    { name = "types-regex", specifier = ">=2024.11.6.20250403" },
+    { name = "types-requests", specifier = ">=2.32.0.20250602" },
+    { name = "types-tqdm", specifier = ">=4.67.0.20250516" },
+    { name = "types-ujson", specifier = ">=5.10.0.20250326" },
+]
 
 [[package]]
 name = "ollama"

@@ -3,9 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger.app_logger import log
 from app.models.MemoryChunk import MemoryChunk
-from app.services.memory.memory_errors import MemoryAddError
-from app.services.embedding.embedding_service import generate_embeddings_from_memory_chunk
 from app.services.embedding.embedding_errors import EmbeddingSaveError
+from app.services.embedding.embedding_service import (
+    generate_embeddings_from_memory_chunk,
+)
+from app.services.memory.memory_errors import MemoryAddError
 
 ic.configureOutput(includeContext=True)
 

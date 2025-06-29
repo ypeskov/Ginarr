@@ -3,14 +3,14 @@ from typing import Optional
 
 from jose import jwt
 from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.User import User
-from app.api.v1.schemas.auth_schema import UserRegister, UserLogin, ChangePassword
+from app.api.v1.schemas.auth_schema import ChangePassword, UserLogin, UserRegister
 from app.config.settings import settings
-from app.services.auth.errors import UserAlreadyExists, InvalidPassword
 from app.core.logger.app_logger import log
+from app.models.User import User
+from app.services.auth.errors import InvalidPassword, UserAlreadyExists
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

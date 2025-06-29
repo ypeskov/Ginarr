@@ -1,15 +1,16 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends
+from icecream import ic
+from langchain_core.runnables import Runnable
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api.v1.schemas.ginarr_schema import GinarrQuery
+from app.core.database.db import get_db
+from app.dependencies.auth import get_current_user
 from app.ginarr.agent import run_ginarr_agent
 from app.ginarr.graph import build_ginarr_graph
-from langchain_core.runnables import Runnable
 from app.models.User import User
-from app.dependencies.auth import get_current_user
-from app.core.database.db import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
-from icecream import ic
 
 ic.configureOutput(includeContext=True)
 

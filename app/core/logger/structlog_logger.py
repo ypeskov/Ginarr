@@ -1,5 +1,6 @@
 import logging
 import sys
+
 import structlog
 
 # Configure standard logging, since structlog uses it

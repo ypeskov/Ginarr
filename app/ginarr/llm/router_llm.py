@@ -2,10 +2,10 @@ import json
 from typing import Any, Literal, get_args
 
 from icecream import ic
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import Runnable, RunnableLambda
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import Runnable, RunnableLambda
 
 from app.core.i18n.prompts import get_prompt
 from app.core.logger.app_logger import log

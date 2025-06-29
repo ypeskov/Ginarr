@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TypedDict, Any, Literal
+from typing import Any, Literal, TypedDict
 
 from app.ginarr.llm.router_llm import RouteName
 

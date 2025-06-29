@@ -1,15 +1,15 @@
+import debugpy
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from icecream import ic
-import debugpy
 
-from app.core.logger.app_logger import log
-from app.config.settings import settings
 from app.api.v1.routers.auth_router import router as auth_router
+from app.api.v1.routers.ginarr_router import router as ginarr_router
 from app.api.v1.routers.memory_router import router as memory_router
 from app.api.v1.routers.search_router import router as search_router
-from app.api.v1.routers.ginarr_router import router as ginarr_router
+from app.config.settings import settings
+from app.core.logger.app_logger import log
 
 if settings.DEBUG:
     debugpy.listen(("0.0.0.0", 5678))

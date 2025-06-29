@@ -1,16 +1,11 @@
 from icecream import ic
 
-from app.ginarr.llm.router_llm import router_llm
-from app.ginarr.graph_state import GinarrState, MemorizePayload
 from app.core.logger.app_logger import log
+from app.ginarr.graph_state import GinarrState, MemorizePayload
+from app.ginarr.llm.router_llm import router_llm
 
 ic.configureOutput(includeContext=True)
 
-def universal_question_tool(question: str) -> str:
-    """Return the answer to the question"""
-    ic(question)
-    ic('========================================')
-    return "the answer is 42"
 
 tool_list = """
 universal_question_tool:
@@ -18,6 +13,7 @@ universal_question_tool:
   Аргументы:
     - question (str): вопрос, на который требуется ответ
 """
+
 
 async def router_node(state: GinarrState) -> GinarrState:
     log.info("Entering router_node")
@@ -28,7 +24,7 @@ async def router_node(state: GinarrState) -> GinarrState:
 
     route = result.get("route", "llm")  # default route is llm
     # TODO: filter unsupported routes (e.g. tool) at runtime
-    allowed_routes = {"memory", "llm", "web_search", "memorize"}
+    allowed_routes = {"memory", "llm", "web_search", "memorize", "tool"}
     if route not in allowed_routes:
         log.warning(f"Unsupported route '{route}' from router_llm. Falling back to 'llm'")
         route = "llm"

@@ -2,10 +2,10 @@ import tiktoken
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.embedding.embedding_errors import EmbeddingGetError
 from app.config.settings import settings
 from app.core.logger.app_logger import log
 from app.services.embedding.backends.base import EmbeddingBackend
+from app.services.embedding.embedding_errors import EmbeddingGetError
 
 
 class OpenAIEmbeddingBackend(EmbeddingBackend):

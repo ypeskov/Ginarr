@@ -1,10 +1,13 @@
 from typing import Any
-from app.services.search.pg_embedding_search import search_embeddings as pg_search_embeddings
+
+from app.models.MemoryChunk import MemoryChunk
 
 # from app.services.search.qdrant_embedding_search import search_embeddings as qdrant_search_embeddings
 from app.services.embedding.registry.models import AvailableEmbeddingModels
 from app.services.embedding.registry.stores import AvailableEmbeddingStores
-from app.models.MemoryChunk import MemoryChunk
+from app.services.search.pg_embedding_search import (
+    search_embeddings as pg_search_embeddings,
+)
 
 _available_embedding_stores_search_functions = {
     AvailableEmbeddingStores.POSTGRES_EMBEDDING_STORE: pg_search_embeddings,

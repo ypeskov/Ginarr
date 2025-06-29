@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pydantic import SecretStr
-from pydantic_settings import SettingsConfigDict, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):

@@ -1,10 +1,10 @@
 from icecream import ic
-
-from app.ginarr.graph_state import GinarrState
-from app.core.logger.app_logger import log
-from app.services.chat.logger import save_chat_message
-from app.models.ChatMessage import ChatMessage, AnswerGeneratedBy
 from langchain_core.runnables import RunnableConfig
+
+from app.core.logger.app_logger import log
+from app.ginarr.graph_state import GinarrState
+from app.models.ChatMessage import AnswerGeneratedBy, ChatMessage
+from app.services.chat.logger import save_chat_message
 
 ic.configureOutput(includeContext=True)
 

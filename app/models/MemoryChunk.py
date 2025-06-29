@@ -1,8 +1,10 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import ForeignKey, Text, TIMESTAMP, func, Enum as SqlAlchemyEnum, Integer
+from sqlalchemy import TIMESTAMP, ForeignKey, Integer, Text, func
+from sqlalchemy import Enum as SqlAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.core.database.db import Base
 from app.models.User import User
 

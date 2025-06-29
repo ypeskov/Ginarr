@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.schemas.auth_schema import UserRegister, UserLogin, ChangePassword
-from app.services.auth import auth_service
+from app.api.v1.schemas.auth_schema import ChangePassword, UserLogin, UserRegister
 from app.core.database.db import get_db
-from app.services.auth.errors import UserAlreadyExists, InvalidPassword
-from app.models.User import User
-from app.dependencies.auth import get_current_user
 from app.core.logger.app_logger import log
+from app.dependencies.auth import get_current_user
+from app.models.User import User
+from app.services.auth import auth_service
+from app.services.auth.errors import InvalidPassword, UserAlreadyExists
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

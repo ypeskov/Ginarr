@@ -1,6 +1,6 @@
+from app.config.settings import settings
 from app.services.embedding.backends.base import EmbeddingBackend
 from app.services.embedding.backends.openai_embedding import OpenAIEmbeddingBackend
-from app.config.settings import settings
 
 _EMBEDDING_PROVIDERS = {
     "openai": OpenAIEmbeddingBackend,

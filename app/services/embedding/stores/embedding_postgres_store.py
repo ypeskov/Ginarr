@@ -1,11 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.embedding.stores.embedding_base_store import EmbeddingBaseStore
+from app.core.logger.app_logger import log
 from app.models.EmbeddingType import EmbeddingType, EmbeddingTypeName
 from app.models.OpenAIEmbedding import OpenAIEmbedding
-from app.core.logger.app_logger import log
 from app.services.embedding.embedding_errors import EmbeddingSaveError
+from app.services.embedding.stores.embedding_base_store import EmbeddingBaseStore
 
 
 class EmbeddingPostgresStore(EmbeddingBaseStore):

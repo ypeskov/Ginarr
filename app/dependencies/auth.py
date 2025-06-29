@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import settings
-from app.core.logger.app_logger import log
 from app.core.database.db import get_db
+from app.core.logger.app_logger import log
 from app.models.User import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

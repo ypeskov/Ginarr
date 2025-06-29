@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import TIMESTAMP, JSON, func
+from sqlalchemy import JSON, TIMESTAMP, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.core.database.db import Base
 
 if TYPE_CHECKING:
