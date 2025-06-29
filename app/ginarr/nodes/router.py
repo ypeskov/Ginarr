@@ -6,12 +6,24 @@ from app.core.logger.app_logger import log
 
 ic.configureOutput(includeContext=True)
 
+def universal_question_tool(question: str) -> str:
+    """Return the answer to the question"""
+    ic(question)
+    ic('========================================')
+    return "the answer is 42"
+
+tool_list = """
+universal_question_tool:
+  Назначение: Ответ на универсальный вопрос
+  Аргументы:
+    - question (str): вопрос, на который требуется ответ
+"""
 
 async def router_node(state: GinarrState) -> GinarrState:
     log.info("Entering router_node")
     user_input = state.input
 
-    result = await router_llm.ainvoke({"input": user_input})
+    result = await router_llm.ainvoke({"input": user_input, "tool_list": tool_list})
     ic(result)
 
     route = result.get("route", "llm")  # default route is llm

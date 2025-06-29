@@ -37,16 +37,28 @@ PROMPTS = {
 
 Пользователь: "Запомни последние 5 сообщений"  
 Ответ:
-"route": "memorize", "memorize_scope": "recent", "memorize_n": 5
+{{"route": "memorize", "memorize_scope": "recent", "memorize_n": 5}}
 
 Пользователь: "Сохрани разговор за последний час"  
 Ответ:
-"route": "memorize", "memorize_scope": "period", "memorize_period": "last_hour"
+{{"route": "memorize", "memorize_scope": "period", "memorize_period": "last_hour"}}
 
 Пользователь: "Расскажи анекдот"  
 Ответ:
-"route": "llm"
+{{"route": "llm"}}
 
-Если не уверен — используй route="llm"
+Если не уверен — используй для значения ключа route значение "llm"
+
+----
+Если ты считаешь, что стоит вызвать инструмент (route="tool"), верни JSON с дополнительными полями:
+- "tool_name" — имя инструмента, который надо вызвать
+- "tool_args" — словарь с аргументами, которые нужно передать
+
+Пример:
+{{"route": "tool", "tool_name": "universal_question_tool", "tool_args": {{"question": "дай ответ на универсальный вопрос"}}}}
+
+Доступные инструменты:
+{tool_list}
+
 """,
 }
