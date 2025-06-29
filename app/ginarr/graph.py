@@ -64,8 +64,6 @@ async def build_ginarr_graph() -> Any:
         },
     )
 
-    builder.add_edge("fallback_router", "router")
-
     builder.add_conditional_edges(
         "check_done",
         lambda state: state.route,

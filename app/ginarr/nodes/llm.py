@@ -22,10 +22,11 @@ async def llm_node(state: GinarrState) -> GinarrState:
     # Extend history with user and assistant messages
     messages.extend([(h["role"], h["content"]) for h in history])
     # Add final answer prompt if LLM decided to end the conversation
-    messages.append(("system", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+    messages.append(("system", get_prompt("router.llm.system_prompt_answer_after_found_results")))
+    # remove empty assistant messages. Llama3 fails if there are empty assistant messages
+    messages = [m for m in history if not (m["role"] == "assistant" and not m["content"].strip())]
 
     prompt = ChatPromptTemplate.from_messages(messages)
-
     response = await chat_llm.ainvoke(prompt.invoke({"input": user_input}))
 
     # Handle both single message and message list responses
@@ -43,8 +44,8 @@ async def llm_node(state: GinarrState) -> GinarrState:
 
     history.append({"role": "assistant", "content": content})
 
-    # Keep only the last 20 user-assistant pairs (i.e., 40 messages)
-    history = history[-40:]
+    # Keep only the last 10 user-assistant pairs (i.e., 20 messages)
+    history = history[-20:]
 
     # Update state
     state.history = history
@@ -83,13 +84,13 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
     messages = []
     if state.route == "tool":
         messages.append(("system", get_prompt("router.tool.summary")))
-        messages.append(("system", get_prompt("router.tool.system_prompt_final_answer_after_tool_result")))
+        messages.append(("system", get_prompt("router.tool.system_prompt_answer_after_tool_result")))
     elif state.route == "memory":
         messages.append(("system", get_prompt("router.memory.summary")))
-        messages.append(("system", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+        messages.append(("system", get_prompt("router.llm.system_prompt_answer_after_found_results")))
     else:
         messages.append(("system", get_prompt("router.memory.summary")))
-        messages.append(("system", get_prompt("router.llm.system_prompt_final_answer_after_found_results")))
+        messages.append(("system", get_prompt("router.llm.system_prompt_answer_after_found_results")))
 
     messages.append(("system", get_prompt("router.llm.context")))
     messages.append(("user", get_prompt("router.summary.prompt.user")))
@@ -110,7 +111,7 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
     )
     end_time = time.time()
     log.info(f"Time taken to summarize: {end_time - start_time} seconds")
-    ic(f"Response: {response}")
+
     # Handle both single message and message list responses
     content = ""
     if hasattr(response, "content"):
@@ -126,13 +127,13 @@ def summarize_found_result_node(state: GinarrState) -> GinarrState:
         content = content.replace("[[FINAL_ANSWER]]", "").strip()
     elif content.endswith("[[NO_DATA]]"):
         log.info("No data detected")
-        state.is_done = True
+        state.is_done = False
         content = content.replace("[[NO_DATA]]", "").strip()
     else:
         log.info("No final answer detected")
         content = "Пока информации нет, продолжаю поиск"
         state.is_done = False
-    ic(content)
+
     state.result = {
         "type": "llm",
         "input": user_input,

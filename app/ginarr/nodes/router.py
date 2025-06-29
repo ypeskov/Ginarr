@@ -22,7 +22,13 @@ async def router_node(state: GinarrState) -> GinarrState:
     result = await router_llm.ainvoke({"input": user_input, "tool_list": tool_list})
     ic(result)
 
-    allowed_routes = {"memory", "llm", "web_search", "memorize", "tool"}
+    allowed_routes = {
+        "memory",
+        "llm",
+        "web_search",
+        "memorize",
+        "tool",
+    }
     route = result.get("route")
     state.route = route if route in allowed_routes else "llm"
 

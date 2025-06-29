@@ -9,9 +9,8 @@ ic.configureOutput(includeContext=True)
 def check_done_node(state: GinarrState) -> GinarrState:
     log.info("Entering check_done_node")
 
-    ic(state)
-    if state.number_of_cycles > 3:
-        log.info("Conversation is done")
+    if state.number_of_cycles > 2:
+        log.info("Number of cycles is greater than 2. Ending conversation")
         state.route = "custom_end"
         return state
 

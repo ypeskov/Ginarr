@@ -22,13 +22,13 @@ PROMPTS = {
     "router.summary.prompt.user": ("Пользователь запросил: [{user_input}]"),
     "router.summary.prompt.found_results": ("Найденные результаты: [{found_results_str}]"),
     "router.llm.system_prompt": ("Ты помощник. Отвечай на русском. Учитывай весь предыдущий диалог."),
-    "router.llm.system_prompt_final_answer_after_found_results": (
+    "router.llm.system_prompt_answer_after_found_results": (
         "Если считаешь, что твой ответ закончен, то верни в конце текст [[FINAL_ANSWER]]. "
-        "Если в результатах нет данных, и у тебя тоже нет данных, то верни [[NO_DATA]]"
+        "Если в результатах нет данных, и у тебя тоже нет данных, то верни [[NO_DATA]]. "
         "Но если у тебя в базе есть данные, то верни их с указанием источника."
         "Если информация не закончена, то не используй [[FINAL_ANSWER]]."
     ),
-    "router.tool.system_prompt_final_answer_after_tool_result": ("Верни в конце текст [[FINAL_ANSWER]]. "),
+    "router.tool.system_prompt_answer_after_tool_result": ("Верни в конце текст [[FINAL_ANSWER]]. "),
     "router.llm.context": ("Текущий контекст: [{context}]"),
     "router.llm.route_selector": """
 Ты ассистент по маршрутизации в модульной AI-системе. Твоя задача — определить, куда направить пользовательский запрос.
@@ -39,6 +39,9 @@ PROMPTS = {
 - llm — обычный ответ языковой модели
 - web_search — поиск в интернете
 - memorize — сохранить часть диалога
+
+Формат ответа:
+{{"route": "route_name"}}
 
 Если пользователь просит *запомнить* или *сохранить* сообщения — выбери route="memorize".
 
