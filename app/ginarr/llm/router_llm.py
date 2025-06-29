@@ -1,5 +1,5 @@
 import json
-from typing import Literal, get_args
+from typing import Any, Literal, get_args
 
 from icecream import ic
 from langchain_core.prompts import ChatPromptTemplate
@@ -7,9 +7,9 @@ from langchain_core.runnables import Runnable, RunnableLambda
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 
-from app.ginarr.llm.llm_provider import router_selector_llm
 from app.core.i18n.prompts import get_prompt
 from app.core.logger.app_logger import log
+from app.ginarr.llm.llm_provider import chat_llm
 
 ic.configureOutput(includeContext=True)
 
@@ -25,8 +25,21 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnable:
-    def extract_route(msg: AIMessage) -> dict:
-        log.info(msg.content)
+    """
+    Create a router LLM
+    Args:
+        prompt: (ChatPromptTemplate) The prompt to use for the router LLM
+        llm: (BaseChatModel) The LLM to use for the router LLM
+    Returns:
+        Runnable: The router LLM
+    """
+    def extract_route(msg: AIMessage) -> dict[str, Any]:
+        """Extract the route from the message
+        Args:
+            msg: (AIMessage) The message to extract the route from
+        Returns:
+            dict: The route
+        """
         text = str((msg.content or "")).strip()
 
         try:
@@ -46,5 +59,5 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
 
     return route_result
 
-router_llm = create_router_llm(prompt, router_selector_llm)
+router_llm = create_router_llm(prompt, chat_llm)
 log.info("router_llm created")

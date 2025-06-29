@@ -14,7 +14,7 @@ def create_llm(model_name: str) -> BaseChatModel:
     Args:
         model_name: (str) Name of the model to create
     Returns:
-        (BaseChatModel) An LLM instance
+        BaseChatModel: An LLM instance
     """
     try:
         log.info(f"Initializing LLM with model: '{model_name}'")
@@ -41,6 +41,4 @@ def create_llm(model_name: str) -> BaseChatModel:
         log.error(f"Failed to initialize model '{model_name}': {e}")
         raise ValueError(f"Could not create LLM for '{model_name}'") from e
 
-
-router_selector_llm = create_llm(ginarr_settings.LLM_MODEL)
 chat_llm = create_llm(ginarr_settings.LLM_MODEL)

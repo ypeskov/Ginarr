@@ -35,9 +35,10 @@ dependencies = [
     "tiktoken>=0.9.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "debugpy>=1.8.14",
+    "isort>=6.0.1",
     "lxml-stubs>=0.5.1",
     "mypy>=1.16.0",
     "pandas-stubs>=2.2.3.250527",
@@ -57,7 +58,7 @@ dev = [
     "types-regex>=2024.11.6.20250403",
     "types-requests>=2.32.0.20250602",
     "types-tqdm>=4.67.0.20250516",
-    "types-ujson>=5.10.0.20250326",
+    "types-ujson>=5.10.0.20250326"
 ]
 
 [tool.mypy]
