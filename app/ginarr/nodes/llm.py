@@ -18,11 +18,11 @@ async def llm_node(state: GinarrState) -> GinarrState:
 
     history.append({"role": "user", "content": user_input})
 
-    messages = [("system", get_prompt("router.llm.system_prompt"))]
+    messages = [{"role": "system", "content": get_prompt("router.llm.system_prompt")}]
     # Extend history with user and assistant messages
-    messages.extend([(h["role"], h["content"]) for h in history])
+    messages.extend([{"role": h["role"], "content": h["content"]} for h in history])
     # Add final answer prompt if LLM decided to end the conversation
-    messages.append(("system", get_prompt("router.llm.system_prompt_answer_after_found_results")))
+    messages.append({"role": "system", "content": get_prompt("router.llm.system_prompt_answer_after_found_results")})
     # remove empty assistant messages. Llama3 fails if there are empty assistant messages
     messages = [m for m in history if not (m["role"] == "assistant" and not m["content"].strip())]
 

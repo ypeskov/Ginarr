@@ -40,7 +40,7 @@ async def build_ginarr_graph() -> Any:
 
     builder.add_conditional_edges(
         "router",
-        lambda state: state.route,
+        lambda state: state.route.value,
         {
             "memory": "memory",
             "tool": "tool",
@@ -53,7 +53,7 @@ async def build_ginarr_graph() -> Any:
 
     builder.add_conditional_edges(
         "fallback_router",
-        lambda state: state.route,
+        lambda state: state.route.value,
         {
             "memory": "memory",
             "tool": "tool",
@@ -66,7 +66,7 @@ async def build_ginarr_graph() -> Any:
 
     builder.add_conditional_edges(
         "check_done",
-        lambda state: state.route,
+        lambda state: state.route.value,
         {
             "custom_end": "custom_end",
             "fallback_router": "fallback_router",

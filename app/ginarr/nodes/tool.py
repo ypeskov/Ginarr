@@ -26,10 +26,10 @@ async def tool_node(state: GinarrState) -> GinarrState:
     tool_args = state.tool_payload.tool_args
 
     # TODO: implement tool execution
-    tool_result = REGISTERED_TOOLS[tool_name](**tool_args)
+    tool_output = REGISTERED_TOOLS[tool_name](**tool_args)
     tool_result = [
         {
-            "text": tool_result,
+            "text": tool_output,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "score": 1.0,
         }

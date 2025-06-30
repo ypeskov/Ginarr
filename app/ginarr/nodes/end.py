@@ -29,7 +29,7 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     thread_id = state.user_id
     if thread_id is None:
         raise ValueError("Thread ID is required")
-    thread_id = str(thread_id)
+    thread_id_str = str(thread_id)
 
     user_input = state.input
     assistant_output = state.result.get("output", "")
@@ -39,7 +39,7 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
         db_session=db_session,
         chat_message=ChatMessage(
             user_id=user_id,
-            langgraph_thread_id=thread_id,
+            langgraph_thread_id=thread_id_str,
             role="user",
             content=user_input,
             preserved=False,
@@ -50,7 +50,7 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
         db_session=db_session,
         chat_message=ChatMessage(
             user_id=user_id,
-            langgraph_thread_id=thread_id,
+            langgraph_thread_id=thread_id_str,
             role="assistant",
             content=assistant_output,
             preserved=False,
