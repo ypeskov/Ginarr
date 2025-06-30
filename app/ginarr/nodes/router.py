@@ -2,6 +2,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState, MemorizePayload, ToolPayload
+from app.ginarr.llm.allowed_routes import is_allowed_route
 from app.ginarr.llm.router_llm import router_llm
 
 ic.configureOutput(includeContext=True)
@@ -22,18 +23,12 @@ async def router_node(state: GinarrState) -> GinarrState:
     result = await router_llm.ainvoke({"input": user_input, "tool_list": tool_list})
     ic(result)
 
-    allowed_routes = {
-        "memory",
-        "llm",
-        "web_search",
-        "memorize",
-        "tool",
-    }
     route = result.get("route")
-    state.route = route if route in allowed_routes else "llm"
-
-    if route not in allowed_routes:
-        log.warning(f"Unsupported route '{route}' from router_llm. Falling back to 'llm'")
+    state.route = route if is_allowed_route(route) else "llm"
+    if not is_allowed_route(route):
+        log.warning(
+            f"Unsupported route '{route}' from router_llm. Falling back to 'llm'"
+        )
 
     if route == "tool":
         state.tool_payload = ToolPayload(
