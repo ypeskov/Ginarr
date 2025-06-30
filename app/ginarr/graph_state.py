@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypedDict
 
-from app.ginarr.llm.router_llm import RouteName
+from app.ginarr.llm.allowed_routes import RouteName
 
 
 class MemorizePayload(TypedDict, total=False):

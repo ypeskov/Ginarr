@@ -4,5 +4,6 @@ type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "cus
 
 ALLOWED_ROUTES = set(get_args(RouteName))
 
+
 def is_allowed_route(route: str) -> bool:
     return route in ALLOWED_ROUTES
