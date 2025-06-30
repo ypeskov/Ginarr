@@ -67,5 +67,10 @@ strict_optional = true
 disallow_untyped_defs = true
 warn_unused_ignores = true
 
+[tool.ruff]
+line-length = 120
+
 [tool.ruff.lint]
 extend-select = ["I"]
+pycodestyle.max-line-length = 120
+

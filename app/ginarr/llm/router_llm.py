@@ -9,7 +9,7 @@ from langchain_core.runnables import Runnable, RunnableLambda
 
 from app.core.i18n.prompts import get_prompt
 from app.core.logger.app_logger import log
-from app.ginarr.llm.allowed_routes import is_allowed_route
+from app.ginarr.llm.allowed_routes import RouteNameEnum, parse_route_or_default
 from app.ginarr.llm.llm_provider import chat_llm
 
 ic.configureOutput(includeContext=True)
@@ -50,7 +50,11 @@ def create_router_llm(prompt: ChatPromptTemplate, llm: BaseChatModel) -> Runnabl
 
         # Fallback: interpret raw text as route name
         text_lower = text.lower()
-        return {"route": text_lower if is_allowed_route(text_lower) else "llm"}
+        return {
+            "route": text_lower
+            if parse_route_or_default(text_lower)
+            else RouteNameEnum.LLM
+        }
 
     route_result = prompt | llm | RunnableLambda(extract_route)
 

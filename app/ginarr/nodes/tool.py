@@ -16,8 +16,14 @@ REGISTERED_TOOLS = {
 # A placeholder tool execution node
 async def tool_node(state: GinarrState) -> GinarrState:
     log.info("Entering tool_node")
-    tool_name = state.tool_payload.get("tool_name", "")
-    tool_args = state.tool_payload.get("tool_args", {})
+
+    if state.tool_payload is None:
+        log.error("tool_payload is None")
+        state.result = {"type": "tool", "input": state.input, "output": [], "error": "No tool payload provided"}
+        return state
+
+    tool_name = state.tool_payload.tool_name
+    tool_args = state.tool_payload.tool_args
 
     # TODO: implement tool execution
     tool_result = REGISTERED_TOOLS[tool_name](**tool_args)

@@ -1,11 +1,21 @@
-from typing import Literal, get_args
-
-type RouteName = Literal[
-    "memory", "tool", "llm", "web_search", "memorize", "custom_end", "fallback_router"
-]
-
-ALLOWED_ROUTES = set(get_args(RouteName))
+from enum import Enum
 
 
-def is_allowed_route(route: str) -> bool:
-    return route in ALLOWED_ROUTES
+class RouteNameEnum(Enum):
+    MEMORY = "memory"
+    TOOL = "tool"
+    LLM = "llm"
+    WEB_SEARCH = "web_search"
+    MEMORIZE = "memorize"
+    CUSTOM_END = "custom_end"
+    FALLBACK_ROUTER = "fallback_router"
+
+
+def parse_route_or_default(
+    route_str: str,
+    default: RouteNameEnum = RouteNameEnum.LLM,
+) -> RouteNameEnum:
+    try:
+        return RouteNameEnum(route_str)
+    except ValueError:
+        return default
