@@ -67,5 +67,5 @@ strict_optional = true
 disallow_untyped_defs = true
 warn_unused_ignores = true
 
-[tool.ruff]
+[tool.ruff.lint]
 extend-select = ["I"]

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Literal, get_args
+from typing import Any
 
 from icecream import ic
 from langchain_core.language_models import BaseChatModel
@@ -9,13 +9,10 @@ from langchain_core.runnables import Runnable, RunnableLambda
 
 from app.core.i18n.prompts import get_prompt
 from app.core.logger.app_logger import log
+from app.ginarr.llm.allowed_routes import ALLOWED_ROUTES
 from app.ginarr.llm.llm_provider import chat_llm
 
 ic.configureOutput(includeContext=True)
-
-type RouteName = Literal["memory", "tool", "llm", "web_search", "memorize", "custom_end", "fallback_router"]
-
-ALLOWED_ROUTES = set(get_args(RouteName))
 
 prompt = ChatPromptTemplate.from_messages(
     [
