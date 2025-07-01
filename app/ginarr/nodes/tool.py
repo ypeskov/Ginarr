@@ -4,6 +4,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState
+from app.ginarr.llm.allowed_routes import RouteNameEnum
 from app.ginarr.tools.universal_answer import universal_question_tool
 
 ic.configureOutput(includeContext=True)
@@ -17,6 +18,7 @@ REGISTERED_TOOLS = {
 async def tool_node(state: GinarrState) -> GinarrState:
     log.info("Entering tool_node")
 
+    state.visited_routes.append(RouteNameEnum.TOOL)
     if state.tool_payload is None:
         log.error("tool_payload is None")
         state.result = {"type": "tool", "input": state.input, "output": [], "error": "No tool payload provided"}

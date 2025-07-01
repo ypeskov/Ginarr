@@ -5,6 +5,7 @@ from icecream import ic
 
 from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState
+from app.ginarr.llm.allowed_routes import RouteNameEnum
 from app.ginarr.settings import settings
 
 ic.configureOutput(includeContext=True)
@@ -14,6 +15,8 @@ TAVILY_URL = "https://api.tavily.com/search"
 
 async def web_search_node(state: GinarrState) -> GinarrState:
     log.info("Entering web_search_node")
+
+    state.visited_routes.append(RouteNameEnum.WEB_SEARCH)
 
     query = state.input
     api_key = settings.TAVILY_API_KEY.get_secret_value()
@@ -40,15 +43,18 @@ async def web_search_node(state: GinarrState) -> GinarrState:
     state.result = {
         "type": "web_search",
         "input": query,
-        "output": [
+        "output": [],
+    }
+
+    tmp_output = []
+    for r in results:
+        tmp_output.append(
             {
-                "text": r["content"],
+                "text": f"{r['title']}\n{r['content']}\n{r['url']}\n--------------------------------",
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
-            for r in results
-            if "content" in r
-        ],
-    }
+        )
+    state.result["output"] = tmp_output
 
     log.info("Exiting web_search_node")
     return state

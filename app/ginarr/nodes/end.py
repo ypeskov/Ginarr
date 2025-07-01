@@ -18,6 +18,8 @@ async def end_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     """
     log.info("Entering end_node")
 
+    ic(state.visited_routes)
+
     db_session = config.get("configurable", {}).get("db_session", None)
     if db_session is None:
         raise ValueError("DB session is required")

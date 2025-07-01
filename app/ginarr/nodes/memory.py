@@ -4,6 +4,7 @@ from langchain_core.runnables import RunnableConfig, RunnableLambda
 
 from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState
+from app.ginarr.llm.allowed_routes import RouteNameEnum
 from app.ginarr.llm.llm_provider import chat_llm
 from app.models.MemoryChunk import MemoryChunk
 from app.services.search.embedding_search import search_embeddings
@@ -24,6 +25,9 @@ relevance_checker = relevance_prompt | chat_llm | RunnableLambda(lambda msg: msg
 # The node that performs retrieval (RAG) using your embedding backend
 async def memory_node(state: GinarrState, config: RunnableConfig) -> GinarrState:
     log.info("Entering memory_node")
+
+    state.visited_routes.append(RouteNameEnum.MEMORY)
+
     user_input = state.input
     user_id = state.user_id
 

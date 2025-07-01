@@ -1,9 +1,8 @@
-from typing import Any
-
 import aiosqlite
 from icecream import ic
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.graph import END, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from app.core.logger.app_logger import log
 from app.ginarr.ginarr_errors import GinarrGraphCompilationError
@@ -21,7 +20,7 @@ from app.ginarr.settings import settings as ginarr_settings
 ic.configureOutput(includeContext=True)
 
 
-async def build_ginarr_graph() -> Any:
+async def build_ginarr_graph() -> CompiledStateGraph:
     log.info("Building Ginarr graph")
     builder = StateGraph(state_schema=GinarrState)
 

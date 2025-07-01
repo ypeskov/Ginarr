@@ -1,6 +1,7 @@
 from dacite import from_dict
 from icecream import ic
-from langchain_core.runnables import Runnable, RunnableConfig
+from langchain_core.runnables import RunnableConfig
+from langgraph.graph.state import CompiledStateGraph
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger.app_logger import log
@@ -10,7 +11,9 @@ from app.models.User import User
 ic.configureOutput(includeContext=True)
 
 
-async def run_ginarr_agent(user_input: str, graph_instance: Runnable, user: User, db_session: AsyncSession) -> dict:
+async def run_ginarr_agent(
+    user_input: str, graph_instance: CompiledStateGraph, user: User, db_session: AsyncSession
+) -> dict:
     state: GinarrState
     try:
         checkpoint_tuple = await graph_instance.checkpointer.aget_tuple({"configurable": {"thread_id": str(user.id)}})  # type: ignore
@@ -35,6 +38,7 @@ async def run_ginarr_agent(user_input: str, graph_instance: Runnable, user: User
             "db_session": db_session,
         },
     }
+
     result = await graph_instance.ainvoke(state, config=config)
     output = result.get("result", {})
 

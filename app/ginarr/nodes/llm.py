@@ -6,6 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from app.core.i18n.prompts import get_prompt
 from app.core.logger.app_logger import log
 from app.ginarr.graph_state import GinarrState
+from app.ginarr.llm.allowed_routes import RouteNameEnum
 from app.ginarr.llm.llm_provider import chat_llm
 
 ic.configureOutput(includeContext=True)
@@ -13,6 +14,9 @@ ic.configureOutput(includeContext=True)
 
 async def llm_node(state: GinarrState) -> GinarrState:
     log.info("Entering llm_node")
+
+    state.visited_routes.append(RouteNameEnum.LLM)
+
     user_input = state.input
     history = state.history
 
